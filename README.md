@@ -50,8 +50,8 @@ A telepítők a **[Releases](https://github.com/BBencht/FacetCode/releases/lates
 
 | Rendszer | Fájl | Megjegyzés |
 |---|---|---|
-| **macOS** (Apple Silicon és Intel) | `FACET_1.1.0_universal.dmg` | Húzd a FACET-et az Alkalmazások mappába. |
-| **Windows 10 / 11** | `FACET_1.1.0_x64-setup.exe` vagy `.msi` | Ha hiányzik a WebView2, a telepítő automatikusan letölti. |
+| **macOS** (Apple Silicon és Intel) | `FACET_1.1.1_universal.dmg` | Húzd a FACET-et az Alkalmazások mappába. |
+| **Windows 10 / 11** | `FACET_1.1.1_x64-setup.exe` vagy `.msi` | Ha hiányzik a WebView2, a telepítő automatikusan letölti. |
 | **Linux** | `.AppImage`, `.deb` vagy `.rpm` | Az AppImage-et futtathatóvá kell tenni: `chmod +x FACET*.AppImage` |
 
 ### Egyetlen előfeltétel: Java (JDK 11 vagy újabb)
@@ -201,6 +201,11 @@ FacetCode/
 
 ## Változásnapló
 
+### 1.1.1
+- **Windows-javítás:** a motor nem indult el egyes gépeken („A motor nem indult el időben”). Javítva a Windows hosszú útvonalainak (`\\?\`) kezelése.
+- Okosabb Java-keresés: csak 11-es vagy újabb Javát választ, megtalálja az IntelliJ által letöltött JDK-kat (`~/.jdks`) is; ha csak régi Java van a gépen, ezt világosan jelzi.
+- Ha a motor mégsem indul, a hibaablak megmutatja a részleteket és a naplófájl helyét.
+
 ### 1.1.0
 - Asztali alkalmazás Taurival macOS-re, Windows 10/11-re és Linuxra, automatikus GitHub-builddel.
 - **Git:** panel, „Hol tartok?” segéd, Git-térkép (négy terület, commit-gráf, ágak), kisokos, magyar hibamagyarázat, megváltozott sorok jelölése.
@@ -215,4 +220,4 @@ FacetCode/
 
 ---
 
-<p align="center"><sub>Készült ◆ Magyarországon · FACET 1.1.0</sub></p>
+<p align="center"><sub>Készült ◆ Magyarországon · FACET 1.1.1</sub></p>

@@ -55,7 +55,7 @@ import java.util.stream.Stream;
 
 public class Facet {
 
-    static final String VERSION = "1.1.0";
+    static final String VERSION = "1.1.1";
     /** A megnyitott mappa (null, ha még nincs). */
     static volatile Path WS;
     /** A FACET saját adatai a megnyitott mappához (Időgép, fordítás, kuka) — nem a projektbe kerülnek. */
@@ -142,7 +142,12 @@ public class Facet {
 
     static Path findWeb(String override) {
         List<Path> candidates = new ArrayList<>();
-        if (override != null) candidates.add(Paths.get(override));
+        if (override != null) {
+            // Windowson a „\\?\” előtagú (hosszú) útvonalat a Java nem érti — levágjuk.
+            String o = override.startsWith("\\\\?\\UNC\\") ? "\\\\" + override.substring(8)
+                     : override.startsWith("\\\\?\\") ? override.substring(4) : override;
+            try { candidates.add(Paths.get(o)); } catch (Exception e) { System.err.println("Hibás --web útvonal: " + override); }
+        }
         try {
             Path self = Paths.get(Facet.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
             if (self != null) { candidates.add(self.resolve("web")); candidates.add(self.resolveSibling("web")); }
