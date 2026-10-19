@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>FACET</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { height: 100%; margin: 0; }
+  body { background: #0C0F14; color: #D6DEEB; font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, sans-serif; display: flex; align-items: center; justify-content: center; -webkit-user-select: none; user-select: none; }
+  .wrap { display: flex; flex-direction: column; align-items: center; gap: 22px; max-width: 520px; padding: 24px; text-align: center; }
+  .gem { width: 72px; height: 72px; animation: breathe 1.8s ease-in-out infinite; }
+  @keyframes breathe { 50% { transform: scale(.92); opacity: .75; } }
+  .word { font-weight: 700; letter-spacing: .3em; font-size: 22px; color: #F1F5FB; margin-right: -.3em; }
+  .status { color: #7C889C; font-size: 13px; }
+  .err { display: none; flex-direction: column; gap: 12px; padding: 18px 20px; border-radius: 14px; background: #121721; border: 1px solid #2A3341; text-align: left; -webkit-user-select: text; user-select: text; }
+  .err h2 { margin: 0; font-size: 16px; color: #F1F5FB; }
+  .err p { margin: 0; color: #A9B4C6; }
+  .err code { font: 12.5px ui-monospace, Menlo, Consolas, monospace; color: #FFB27F; background: #0C0F14; padding: 2px 6px; border-radius: 5px; }
+  .err ol { margin: 0; padding-left: 20px; color: #C9D3E2; }
+  .err li { margin: 4px 0; }
+  .failed .gem { animation: none; opacity: .5; }
+  .failed .status { display: none; }
+  .failed .err { display: flex; }
+  @media (prefers-reduced-motion: reduce) { .gem { animation: none; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <svg class="gem" viewBox="0 0 26 26" aria-hidden="true">
+    <path d="M13 1 L24 8 L24 18 L13 25 L2 18 L2 8 Z" fill="#161C27" stroke="#2C3646" stroke-width="0.6"/>
+    <path d="M13 1 L24 8 L13 13 Z" fill="#FF8A3D"/>
+    <path d="M2 8 L13 1 L13 13 Z" fill="#FF5C7A"/>
+    <path d="M2 8 L13 13 L13 25 L2 18 Z" fill="#4DA3FF"/>
+    <path d="M13 13 L24 8 L24 18 L13 25 Z" fill="#273142"/>
+  </svg>
+  <div class="word">FACET</div>
+  <div class="status" id="status">Indul a motor…</div>
+  <div class="err" id="err"></div>
+</div>
+<script>
+  window.facetError = function (code, os) {
+    if (document.body.classList.contains('failed')) return;
+    var e = document.getElementById('err');
+    var mac = os === 'macos', win = os === 'windows';
+    if (code === 'nojava') {
+      e.innerHTML = '<h2>Kell egy Java (JDK) a géped­re</h2>' +
+        '<p>A FACET motorja és a Java-fordítás is a JDK-t használja. Telepítsd egyszer, utána minden működik.</p>' +
+        '<ol>' +
+        (mac ? '<li>Nyisd meg: <code>adoptium.net</code>, és töltsd le a <b>Temurin 21 (LTS)</b> macOS .pkg telepítőjét — vagy Terminálban: <code>brew install --cask temurin</code></li>'
+             : win ? '<li>Nyisd meg: <code>adoptium.net</code>, és töltsd le a <b>Temurin 21 (LTS)</b> Windows .msi telepítőjét. Telepítéskor pipáld be: „Set JAVA_HOME”.</li>'
+             : '<li>Telepítsd: <code>sudo apt install openjdk-21-jdk</code> (vagy a disztribúciód csomagkezelőjével).</li>') +
+        '<li>Indítsd újra a FACET-et.</li></ol>';
+    } else if (code === 'timeout') {
+      e.innerHTML = '<h2>A motor nem indult el időben</h2><p>Lehet, hogy a gép épp nagyon le van terhelve, vagy egy víruskereső blokkolja a Javát. Indítsd újra a FACET-et.</p>';
+    } else {
+      e.innerHTML = '<h2>A FACET nem tudott elindulni</h2><p>Hibakód: <code>' + String(code).replace(/[<>&]/g, '') + '</code></p><p>Telepítsd újra az alkalmazást a legfrissebb kiadásból.</p>';
+    }
+    document.body.classList.add('failed');
+  };
+  setTimeout(function () { var s = document.getElementById('status'); if (s) s.textContent = 'Még indul… (az első indítás tovább tarthat)'; }, 6000);
+</script>
+</body>
+</html>

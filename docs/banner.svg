@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-label="FACET — Minden fájlnak saját arca">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E1219"/>
+      <stop offset="1" stop-color="#0A0D12"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.22" cy="0.45" r="0.5">
+      <stop offset="0" stop-color="#FF8A3D" stop-opacity="0.16"/>
+      <stop offset="0.5" stop-color="#4DA3FF" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#0C0F14" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="1.2" fill="#1A202B"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="420" rx="28" fill="url(#bg)"/>
+  <rect width="1280" height="420" rx="28" fill="url(#dots)" opacity="0.7"/>
+  <rect width="1280" height="420" rx="28" fill="url(#glow)"/>
+
+  <g transform="translate(130 92) scale(9.2)">
+    <path d="M13 1 L24 8 L24 18 L13 25 L2 18 L2 8 Z" fill="#161C27" stroke="#2C3646" stroke-width="0.25"/>
+    <path d="M13 1 L24 8 L13 13 Z" fill="#FF8A3D"/>
+    <path d="M2 8 L13 1 L13 13 Z" fill="#FF5C7A"/>
+    <path d="M2 8 L13 13 L13 25 L2 18 Z" fill="#4DA3FF"/>
+    <path d="M13 13 L24 8 L24 18 L13 25 Z" fill="#273142"/>
+  </g>
+
+  <g font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+    <text x="440" y="178" font-size="92" font-weight="800" letter-spacing="14" fill="#F1F5FB">FACET</text>
+    <text x="444" y="232" font-size="30" font-weight="500" fill="#C3CDDC">Minden fájlnak saját arca.</text>
+    <text x="444" y="272" font-size="19" fill="#7C889C">IDE Java- és webfejlesztéshez · macOS · Windows · Linux</text>
+
+    <g font-size="15" font-weight="600">
+      <g transform="translate(444 310)">
+        <rect width="104" height="36" rx="18" fill="#FF8A3D" fill-opacity="0.12" stroke="#FF8A3D" stroke-opacity="0.4"/>
+        <rect x="18" y="14" width="8" height="8" rx="2" transform="rotate(45 22 18)" fill="#FF8A3D"/>
+        <text x="36" y="23" fill="#FF8A3D">Java</text>
+      </g>
+      <g transform="translate(560 310)">
+        <rect width="110" height="36" rx="18" fill="#FF5C7A" fill-opacity="0.12" stroke="#FF5C7A" stroke-opacity="0.4"/>
+        <rect x="18" y="14" width="8" height="8" rx="2" transform="rotate(45 22 18)" fill="#FF5C7A"/>
+        <text x="36" y="23" fill="#FF5C7A">HTML</text>
+      </g>
+      <g transform="translate(682 310)">
+        <rect width="96" height="36" rx="18" fill="#4DA3FF" fill-opacity="0.12" stroke="#4DA3FF" stroke-opacity="0.4"/>
+        <rect x="18" y="14" width="8" height="8" rx="2" transform="rotate(45 22 18)" fill="#4DA3FF"/>
+        <text x="36" y="23" fill="#4DA3FF">CSS</text>
+      </g>
+      <g transform="translate(790 310)">
+        <rect width="150" height="36" rx="18" fill="#F5C451" fill-opacity="0.12" stroke="#F5C451" stroke-opacity="0.4"/>
+        <rect x="18" y="14" width="8" height="8" rx="2" transform="rotate(45 22 18)" fill="#F5C451"/>
+        <text x="36" y="23" fill="#F5C451">JavaScript</text>
+      </g>
+      <g transform="translate(952 310)">
+        <rect width="160" height="36" rx="18" fill="#E6D3B3" fill-opacity="0.12" stroke="#E6D3B3" stroke-opacity="0.4"/>
+        <rect x="18" y="14" width="8" height="8" rx="2" transform="rotate(45 22 18)" fill="#E6D3B3"/>
+        <text x="36" y="23" fill="#E6D3B3">Dokumentum</text>
+      </g>
+    </g>
+    <text x="1236" y="56" font-size="15" font-weight="600" fill="#586377" text-anchor="end">v1.1.0</text>
+  </g>
+</svg>

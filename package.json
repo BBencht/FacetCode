@@ -1,0 +1,19 @@
+{
+  "name": "facet",
+  "private": true,
+  "version": "1.1.0",
+  "description": "FACET — IDE, ami átalakul a fájl típusához",
+  "scripts": {
+    "prepare-app": "node scripts/prepare.mjs",
+    "icons": "tauri icon app-icon.png",
+    "dev": "node scripts/prepare.mjs && tauri dev",
+    "build": "node scripts/prepare.mjs && tauri build",
+    "tauri": "tauri",
+    "browser": "java engine/Facet.java"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0",
+    "emmet-monaco-es": "5.5.0",
+    "monaco-editor": "0.52.2"
+  }
+}

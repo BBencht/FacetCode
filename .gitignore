@@ -1,0 +1,13 @@
+node_modules/
+build/
+src-tauri/target/
+src-tauri/res/
+src-tauri/gen/
+src-tauri/icons/
+web/vendor/
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.facet-tmp

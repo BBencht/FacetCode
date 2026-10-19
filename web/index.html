@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FACET</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Cpath d='M13 1L24 8V18L13 25L2 18V8Z' fill='%23161C27'/%3E%3Cpath d='M13 1L24 8L13 13Z' fill='%23FF8A3D'/%3E%3Cpath d='M2 8L13 1L13 13Z' fill='%23FF5C7A'/%3E%3Cpath d='M2 8L13 13V25L2 18Z' fill='%234DA3FF'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Unbounded:wght@500;700&display=swap">
+<link rel="stylesheet" href="facet.css">
+</head>
+<body data-facet="none">
+<div id="app">
+  <header id="top">
+    <div class="brand">
+      <svg class="gem" width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+        <path d="M13 1 L24 8 L24 18 L13 25 L2 18 L2 8 Z" fill="#161C27" stroke="#2C3646" stroke-width="1"></path>
+        <path class="gem-face" d="M13 1 L24 8 L13 13 Z"></path>
+        <path d="M2 8 L13 13 L13 25 L2 18 Z" fill="#1F2734"></path>
+        <path d="M13 13 L24 8 L24 18 L13 25 Z" fill="#273142"></path>
+      </svg>
+      <span class="wordmark">FACET</span>
+    </div>
+    <button class="ghost project-btn" id="projectBtn" title="Projekt váltása"><span id="projectName">Munkaterület</span><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 L5 6.5 L8 3.5" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg></button>
+    <button class="cmdbar" id="cmdBar">
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-width="1.4"></circle><path d="M9.5 9.5 L13 13" stroke="currentColor" stroke-width="1.4"></path></svg>
+      <span class="cmdbar-text">Fájl, parancs vagy keresés… pl. „getter”, „új osztály”</span>
+      <span class="kbd">⌘K</span>
+    </button>
+    <div class="top-right">
+      <span class="layout-btns">
+        <button class="icon-btn layout-btn on" id="toggleSide" title="Oldalsáv ki/be (⌘B)" aria-label="Oldalsáv ki/be" aria-pressed="true"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"></rect><rect class="fillbar" x="2.2" y="3.2" width="4" height="9.6" rx="1"></rect><path d="M6.5 2.5 V13.5" stroke="currentColor" stroke-width="1.3"></path></svg></button>
+        <button class="icon-btn layout-btn on" id="toggleStage" title="Facet-panel ki/be (⌥⌘B)" aria-label="Facet-panel ki/be" aria-pressed="true"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"></rect><rect class="fillbar" x="9.8" y="3.2" width="4" height="9.6" rx="1"></rect><path d="M9.5 2.5 V13.5" stroke="currentColor" stroke-width="1.3"></path></svg></button>
+      </span>
+      <span class="facet-chip" id="facetChip"><span class="diamond"></span><span id="facetChipText">FACET</span></span>
+      <button class="run-btn" id="runBtn" disabled>
+        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.5 L10.5 6 L3 10.5 Z" fill="currentColor"></path></svg>
+        <span id="runLabel">Futtatás</span>
+        <span class="run-kbd">⌘↵</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="body">
+    <nav id="rail" aria-label="Oldalsáv">
+      <button class="rail-btn active" data-view="files" title="Fájlok (⌘⇧E)" aria-label="Fájlok"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 4.5 h4 l1.5 1.5 H15 v8.5 H3 Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"></path></svg></button>
+      <button class="rail-btn" data-view="search" title="Keresés a projektben (⌘⇧F)" aria-label="Keresés"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="1.4"></circle><path d="M12 12 L15.5 15.5" stroke="currentColor" stroke-width="1.4"></path></svg></button>
+      <button class="rail-btn" data-view="git" title="Git — verziókezelés" aria-label="Git"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="5" cy="4" r="1.8" fill="none" stroke="currentColor" stroke-width="1.4"></circle><circle cx="5" cy="14" r="1.8" fill="none" stroke="currentColor" stroke-width="1.4"></circle><circle cx="13" cy="7" r="1.8" fill="none" stroke="currentColor" stroke-width="1.4"></circle><path d="M5 5.8 V12.2 M13 8.8 C13 11 9 11 6.4 12.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path></svg><span class="rail-badge" id="gitBadge" hidden></span></button>
+      <button class="rail-btn" data-view="history" title="Időgép" aria-label="Időgép"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"></circle><path d="M9 5 V9 L12 10.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path></svg></button>
+      <div class="rail-spacer"></div>
+      <button class="rail-btn" id="flowBtn" title="Flow mód (⌘⇧L)" aria-label="Flow mód"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 11 C5 11 5 6 9 6 C13 6 13 11 16 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path></svg></button>
+      <button class="rail-btn" data-view="settings" title="Beállítások" aria-label="Beállítások"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="2.5" fill="none" stroke="currentColor" stroke-width="1.4"></circle><path d="M9 2 V4 M9 14 V16 M2 9 H4 M14 9 H16 M4 4 L5.4 5.4 M12.6 12.6 L14 14 M4 14 L5.4 12.6 M12.6 5.4 L14 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path></svg></button>
+    </nav>
+
+    <aside id="side">
+      <section class="side-view" id="view-files">
+        <div class="side-head">
+          <span class="eyebrow side-title" id="sideTitle">Fájlok</span>
+          <span class="side-actions">
+            <button class="icon-btn" id="newFileBtn" title="Új fájl" aria-label="Új fájl"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5 h5 l3 3 v8 H3 Z M7 6 v5 M4.5 8.5 h5" fill="none" stroke="currentColor" stroke-width="1.2"></path></svg></button>
+            <button class="icon-btn" id="newFolderBtn" title="Új mappa" aria-label="Új mappa"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1.5 3.5 h4 l1 1 h6 v7 h-11 Z M7 6 v4 M5 8 h4" fill="none" stroke="currentColor" stroke-width="1.2"></path></svg></button>
+            <button class="icon-btn" id="newProjectBtn" title="Új projekt" aria-label="Új projekt"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1.5 L12.5 4.5 V9.5 L7 12.5 L1.5 9.5 V4.5 Z M7 5 v4 M5 7 h4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"></path></svg></button>
+            <button class="icon-btn" id="refreshBtn" title="Frissítés" aria-label="Frissítés"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M11.5 6.5 A4.5 4.5 0 1 1 9.8 3 M10 1 V3.5 H7.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg></button>
+            <button class="icon-btn" id="sideClose" title="Oldalsáv bezárása (⌘B)" aria-label="Oldalsáv bezárása"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M8.5 3.5 L5 7 L8.5 10.5" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg></button>
+          </span>
+        </div>
+        <div id="tree" class="tree" tabindex="0"></div>
+        <div id="outlineBox" class="outline-box">
+          <span class="eyebrow" id="outlineTitle">Vázlat</span>
+          <div id="outline"></div>
+        </div>
+      </section>
+      <section class="side-view" id="view-search" hidden>
+        <div class="side-head"><span class="eyebrow">Keresés a projektben</span></div>
+        <div class="search-box">
+          <input id="searchInput" class="field" placeholder="Keresett szöveg" autocomplete="off" spellcheck="false">
+          <label class="check"><input type="checkbox" id="searchCase"> Kis- és nagybetű számít</label>
+        </div>
+        <div id="searchResults" class="search-results"></div>
+      </section>
+      <section class="side-view" id="view-git" hidden>
+        <div class="side-head"><span class="eyebrow">Git</span><span class="side-actions"><button class="icon-btn" id="gitRefresh" title="Frissítés" aria-label="Git frissítése"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M11.5 6.5 A4.5 4.5 0 1 1 9.8 3 M10 1 V3.5 H7.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg></button></span></div>
+        <div id="gitPanel" class="git-panel"></div>
+      </section>
+      <section class="side-view" id="view-history" hidden>
+        <div class="side-head"><span class="eyebrow">Időgép</span></div>
+        <div id="historyPanel" class="history-panel"></div>
+      </section>
+      <section class="side-view" id="view-settings" hidden>
+        <div class="side-head"><span class="eyebrow">Beállítások</span></div>
+        <div id="settingsPanel" class="settings"></div>
+      </section>
+    </aside>
+    <div class="gutter v" data-gutter="side"></div>
+
+    <main id="center">
+      <div id="tabs" role="tablist"></div>
+      <div id="toolbar"></div>
+      <div id="pulse" aria-hidden="true"></div>
+      <div id="editorWrap">
+        <div id="editor"></div>
+        <div id="customView" hidden></div>
+        <div id="gitView" hidden></div>
+        <div id="welcome"></div>
+        <div id="imageView" hidden></div>
+        <div id="diffView" hidden>
+          <div class="diff-head">
+            <span class="diff-title" id="diffTitle"></span>
+            <span class="diff-actions">
+              <span id="diffExtra" class="diff-extra"></span>
+              <button class="btn accent" id="diffRestore">Visszaállítás erre</button>
+              <button class="btn" id="diffClose">Bezárás <span class="kbd">Esc</span></button>
+            </span>
+          </div>
+          <div id="diffEditor"></div>
+        </div>
+        <div id="loading"><div class="loading-gem"></div><span>A szerkesztő betöltése…</span></div>
+      </div>
+      <div class="gutter h" data-gutter="bottom"></div>
+      <section id="bottom">
+        <div class="bottom-head">
+          <div class="bottom-tabs" id="bottomTabs">
+            <button class="seg active" data-pane="terminal">Terminál</button>
+            <button class="seg" data-pane="console">Konzol <span class="count" id="consoleCount"></span></button>
+            <button class="seg" data-pane="problems">Problémák <span class="count" id="problemCount"></span></button>
+          </div>
+          <span class="bottom-hint" id="bottomHint"></span>
+          <span class="bottom-actions">
+            <button class="icon-btn" id="stopBtn" title="Program leállítása" aria-label="Program leállítása" hidden><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="2" width="8" height="8" rx="1.5" fill="currentColor"></rect></svg></button>
+            <button class="icon-btn" id="clearBtn" title="Törlés" aria-label="Panel törlése"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 4 h8 M5.5 4 V2.5 h3 V4 M4 4 l0.6 8 h4.8 L10 4" fill="none" stroke="currentColor" stroke-width="1.2"></path></svg></button>
+            <button class="icon-btn" id="collapseBtn" title="Panel elrejtése (⌘J)" aria-label="Panel elrejtése"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 5 L7 9 L11 5" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg></button>
+          </span>
+        </div>
+        <div class="pane" id="pane-terminal">
+          <div id="termOut" class="term-out"></div>
+          <label class="term-in" id="termInWrap" for="termIn">
+            <span class="prompt">›</span>
+            <input id="termIn" placeholder="A program bemenete — Enter küldi a futó programnak" autocomplete="off" spellcheck="false" disabled>
+            <span class="kbd">Enter</span>
+          </label>
+        </div>
+        <div class="pane" id="pane-console" hidden><div id="consoleOut" class="term-out"></div></div>
+        <div class="pane" id="pane-problems" hidden><div id="problemsOut" class="problems"></div></div>
+      </section>
+    </main>
+    <div class="gutter v" data-gutter="stage"></div>
+
+    <aside id="stage" aria-label="Facet panel">
+      <div class="stage-head">
+        <div class="stage-tabs" id="stageTabs"></div>
+        <span class="stage-spacer"></span>
+        <button class="icon-btn" id="stageClose" title="Facet-panel bezárása (⌥⌘B)" aria-label="Facet-panel bezárása"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5.5 3.5 L9 7 L5.5 10.5" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg></button>
+      </div>
+      <div class="stage-body" id="stageBody"></div>
+    </aside>
+  </div>
+
+  <footer id="status">
+    <span class="st-facet"><span class="diamond"></span><span id="stFacet">FACET</span></span>
+    <span id="stCursor"></span>
+    <span id="stIndent"></span>
+    <span id="stLang"></span>
+    <span class="st-right">
+      <span id="stEngine"><span class="dot"></span><span id="stEngineText">Kapcsolódás…</span></span>
+      <span id="stSave"></span>
+      <span id="stFlow" title="Ennyi ideje dolgozol ebben a munkamenetben"></span>
+    </span>
+  </footer>
+</div>
+
+<div id="flowPill" hidden><span class="diamond"></span><span id="flowTime">0:00</span><span class="flow-sep"></span><span>Flow mód</span><span class="kbd">Esc</span></div>
+<div id="overlay" hidden></div>
+<div id="menu" class="menu" hidden></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>window.__monacoBase = new URL('vendor/monaco/', location.href).href;</script>
+<script src="vendor/monaco/vs/loader.js"></script>
+<script>
+  if (!window.require) {
+    window.__monacoBase = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/';
+    document.write('<script src="' + window.__monacoBase + 'vs/loader.js"><\/script>');
+  }
+</script>
+<script src="vendor/emmet/emmet-monaco.min.js"></script>
+<script>if (!window.emmetMonaco) document.write('<script src="https://cdn.jsdelivr.net/npm/emmet-monaco-es@5.5.0/dist/emmet-monaco.min.js"><\/script>');</script>
+<script src="js/samples.js"></script>
+<script src="js/core.js"></script>
+<script src="js/java.js"></script>
+<script src="js/web.js"></script>
+<script src="js/jsplus.js"></script>
+<script src="js/git.js"></script>
+<script src="js/doc.js"></script>
+<script>F.boot();</script>
+</body>
+</html>
