@@ -4,11 +4,11 @@
 
 <br>
 
-<a href="https://github.com/BBencht/FacetCode/releases/latest"><img alt="Letöltés" src="https://img.shields.io/github/v/release/BBencht/FacetCode?label=let%C3%B6lt%C3%A9s&color=FF8A3D&style=for-the-badge&labelColor=161C27"></a>
+<a href="https://github.com/BBencht/FacetCode/releases/latest"><img alt="Letöltés" src="https://img.shields.io/badge/let%C3%B6lt%C3%A9s-v1.1.1-FF8A3D?style=for-the-badge&labelColor=161C27"></a>
 <img alt="macOS" src="https://img.shields.io/badge/macOS-161C27?style=for-the-badge">
 <img alt="Windows 10/11" src="https://img.shields.io/badge/Windows_10%2F11-161C27?style=for-the-badge">
 <img alt="Linux" src="https://img.shields.io/badge/Linux-161C27?style=for-the-badge&logo=linux&logoColor=F5C451">
-<a href="https://github.com/BBencht/FacetCode/actions"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/BBencht/FacetCode/build.yml?style=for-the-badge&label=build&labelColor=161C27"></a>
+<img alt="Java 11+" src="https://img.shields.io/badge/Java-11%2B-4DA3FF?style=for-the-badge&labelColor=161C27">
 
 <h3>A fejlesztői környezet, ami átalakul ahhoz, amin épp dolgozol.</h3>
 
