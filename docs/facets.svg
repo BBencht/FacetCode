@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="424" viewBox="0 0 1280 424" role="img" aria-label="A FACET hat arca: Java, HTML, CSS, JavaScript, Git, Dokumentum">
+<defs><style>.t{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif}.m{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}</style>
+<radialGradient id="r0" cx="0.1" cy="0" r="0.9"><stop offset="0" stop-color="#FF8A3D" stop-opacity="0.22"/><stop offset="1" stop-color="#FF8A3D" stop-opacity="0"/></radialGradient>
+<radialGradient id="r1" cx="0.1" cy="0" r="0.9"><stop offset="0" stop-color="#FF5C7A" stop-opacity="0.22"/><stop offset="1" stop-color="#FF5C7A" stop-opacity="0"/></radialGradient>
+<radialGradient id="r2" cx="0.1" cy="0" r="0.9"><stop offset="0" stop-color="#4DA3FF" stop-opacity="0.22"/><stop offset="1" stop-color="#4DA3FF" stop-opacity="0"/></radialGradient>
+<radialGradient id="r3" cx="0.1" cy="0" r="0.9"><stop offset="0" stop-color="#F5C451" stop-opacity="0.22"/><stop offset="1" stop-color="#F5C451" stop-opacity="0"/></radialGradient>
+<radialGradient id="r4" cx="0.1" cy="0" r="0.9"><stop offset="0" stop-color="#6FD3C1" stop-opacity="0.22"/><stop offset="1" stop-color="#6FD3C1" stop-opacity="0"/></radialGradient>
+<radialGradient id="r5" cx="0.1" cy="0" r="0.9"><stop offset="0" stop-color="#E6D3B3" stop-opacity="0.22"/><stop offset="1" stop-color="#E6D3B3" stop-opacity="0"/></radialGradient>
+</defs>
+<g transform="translate(20 14)">
+<rect width="405" height="190" rx="20" fill="#0F141C"/><rect width="405" height="190" rx="20" fill="url(#r0)"/>
+<rect x="0.5" y="0.5" width="404" height="189" rx="20" fill="none" stroke="#FF8A3D" stroke-opacity="0.28"/>
+<rect x="32" y="34" width="22" height="22" rx="5" transform="rotate(45 43 45)" fill="#FF8A3D"/>
+<text class="t" x="72" y="54" font-size="25" font-weight="750" fill="#F1F5FB">Java</text>
+<text class="m" x="377" y="52" font-size="14" fill="#FF8A3D" text-anchor="end" opacity="0.85">.java</text>
+<text class="t" x="32" y="112" font-size="16.5" fill="#AEB8C8">Hibatolmács magyarul, osztálytérkép,</text>
+<text class="t" x="32" y="138" font-size="16.5" fill="#AEB8C8">UML-export, generátorok, Scanner-futtatás</text>
+<rect x="32" y="164" width="64" height="4" rx="2" fill="#FF8A3D" opacity="0.7"/>
+</g>
+<g transform="translate(437.5 14)">
+<rect width="405" height="190" rx="20" fill="#0F141C"/><rect width="405" height="190" rx="20" fill="url(#r1)"/>
+<rect x="0.5" y="0.5" width="404" height="189" rx="20" fill="none" stroke="#FF5C7A" stroke-opacity="0.28"/>
+<rect x="32" y="34" width="22" height="22" rx="5" transform="rotate(45 43 45)" fill="#FF5C7A"/>
+<text class="t" x="72" y="54" font-size="25" font-weight="750" fill="#F1F5FB">HTML</text>
+<text class="m" x="377" y="52" font-size="14" fill="#FF5C7A" text-anchor="end" opacity="0.85">.html</text>
+<text class="t" x="32" y="112" font-size="16.5" fill="#AEB8C8">Élő előnézet telefonon, tableten,</text>
+<text class="t" x="32" y="138" font-size="16.5" fill="#AEB8C8">kattints az oldalra → ugrik a kódba</text>
+<rect x="32" y="164" width="64" height="4" rx="2" fill="#FF5C7A" opacity="0.7"/>
+</g>
+<g transform="translate(855 14)">
+<rect width="405" height="190" rx="20" fill="#0F141C"/><rect width="405" height="190" rx="20" fill="url(#r2)"/>
+<rect x="0.5" y="0.5" width="404" height="189" rx="20" fill="none" stroke="#4DA3FF" stroke-opacity="0.28"/>
+<rect x="32" y="34" width="22" height="22" rx="5" transform="rotate(45 43 45)" fill="#4DA3FF"/>
+<text class="t" x="72" y="54" font-size="25" font-weight="750" fill="#F1F5FB">CSS</text>
+<text class="m" x="377" y="52" font-size="14" fill="#4DA3FF" text-anchor="end" opacity="0.85">.css</text>
+<text class="t" x="32" y="112" font-size="16.5" fill="#AEB8C8">Színpaletta, Flexbox- és Grid-építő,</text>
+<text class="t" x="32" y="138" font-size="16.5" fill="#AEB8C8">árnyéktervező, CSS-változók</text>
+<rect x="32" y="164" width="64" height="4" rx="2" fill="#4DA3FF" opacity="0.7"/>
+</g>
+<g transform="translate(20 220)">
+<rect width="405" height="190" rx="20" fill="#0F141C"/><rect width="405" height="190" rx="20" fill="url(#r3)"/>
+<rect x="0.5" y="0.5" width="404" height="189" rx="20" fill="none" stroke="#F5C451" stroke-opacity="0.28"/>
+<rect x="32" y="34" width="22" height="22" rx="5" transform="rotate(45 43 45)" fill="#F5C451"/>
+<text class="t" x="72" y="54" font-size="25" font-weight="750" fill="#F1F5FB">JavaScript</text>
+<text class="m" x="377" y="52" font-size="14" fill="#F5C451" text-anchor="end" opacity="0.85">.js  .ts  .jsx</text>
+<text class="t" x="32" y="112" font-size="16.5" fill="#AEB8C8">Node-futtatás, npm-panel, magyar</text>
+<text class="t" x="32" y="138" font-size="16.5" fill="#AEB8C8">hibamagyarázat, gyors javítások</text>
+<rect x="32" y="164" width="64" height="4" rx="2" fill="#F5C451" opacity="0.7"/>
+</g>
+<g transform="translate(437.5 220)">
+<rect width="405" height="190" rx="20" fill="#0F141C"/><rect width="405" height="190" rx="20" fill="url(#r4)"/>
+<rect x="0.5" y="0.5" width="404" height="189" rx="20" fill="none" stroke="#6FD3C1" stroke-opacity="0.28"/>
+<rect x="32" y="34" width="22" height="22" rx="5" transform="rotate(45 43 45)" fill="#6FD3C1"/>
+<text class="t" x="72" y="54" font-size="25" font-weight="750" fill="#F1F5FB">Git</text>
+<text class="m" x="377" y="52" font-size="14" fill="#6FD3C1" text-anchor="end" opacity="0.85">.git</text>
+<text class="t" x="32" y="112" font-size="16.5" fill="#AEB8C8">„Hol tartok?”, Git-térkép, commit-gráf,</text>
+<text class="t" x="32" y="138" font-size="16.5" fill="#AEB8C8">minden lépésnél látod a parancsot</text>
+<rect x="32" y="164" width="64" height="4" rx="2" fill="#6FD3C1" opacity="0.7"/>
+</g>
+<g transform="translate(855 220)">
+<rect width="405" height="190" rx="20" fill="#0F141C"/><rect width="405" height="190" rx="20" fill="url(#r5)"/>
+<rect x="0.5" y="0.5" width="404" height="189" rx="20" fill="none" stroke="#E6D3B3" stroke-opacity="0.28"/>
+<rect x="32" y="34" width="22" height="22" rx="5" transform="rotate(45 43 45)" fill="#E6D3B3"/>
+<text class="t" x="72" y="54" font-size="25" font-weight="750" fill="#F1F5FB">Dokumentum</text>
+<text class="m" x="377" y="52" font-size="14" fill="#E6D3B3" text-anchor="end" opacity="0.85">.docx  .txt</text>
+<text class="t" x="32" y="112" font-size="16.5" fill="#AEB8C8">Mini Word papírnézetben: címsorok,</text>
+<text class="t" x="32" y="138" font-size="16.5" fill="#AEB8C8">listák, táblázat, kép, mentés .docx-be</text>
+<rect x="32" y="164" width="64" height="4" rx="2" fill="#E6D3B3" opacity="0.7"/>
+</g>
+</svg>
