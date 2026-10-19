@@ -15,5 +15,6 @@
     "@tauri-apps/cli": "^2.1.0",
     "emmet-monaco-es": "5.5.0",
     "monaco-editor": "0.52.2"
-  }
+  },
+  "license": "MIT"
 }

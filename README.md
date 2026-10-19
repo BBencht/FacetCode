@@ -9,6 +9,7 @@
 <img alt="Windows 10/11" src="https://img.shields.io/badge/Windows_10%2F11-161C27?style=for-the-badge">
 <img alt="Linux" src="https://img.shields.io/badge/Linux-161C27?style=for-the-badge&logo=linux&logoColor=F5C451">
 <img alt="Java 11+" src="https://img.shields.io/badge/Java-11%2B-4DA3FF?style=for-the-badge&labelColor=161C27">
+<a href="LICENSE"><img alt="MIT licenc" src="https://img.shields.io/badge/licenc-MIT-6FD3C1?style=for-the-badge&labelColor=161C27"></a>
 
 <h3>A fejlesztői környezet, ami átalakul ahhoz, amin épp dolgozol.</h3>
 
@@ -360,6 +361,12 @@ Minden push után a GitHub Actions elkészíti a három rendszer telepítőit. E
 
 - Facet-váltás, Hibatolmács, osztálytérkép, Időgép, élő előnézet, parancspaletta.
 </details>
+
+<br>
+
+## ⚖️ Licenc
+
+A FACET [MIT-licenc](LICENSE) alatt érhető el: szabadon használhatod, módosíthatod és továbbadhatod, akár üzleti célra is. Csak a licencszöveget és a szerző nevét kell megtartani a másolatokban.
 
 <br>
 
