@@ -273,9 +273,14 @@ body.no-pulse #pulse { opacity: .12; }
 .stage-head { display: flex; align-items: center; gap: 6px; margin: 10px 8px 0 12px; flex: none; min-height: 26px; }
 .stage-tabs { display: flex; gap: 4px; padding: 3px; border-radius: 9px; background: var(--raised); border: 1px solid #1E2531; flex: 1; min-width: 0; }
 .stage-tabs[hidden] + .stage-spacer { flex: 1; }
-.stage-tabs .seg { flex: 1; justify-content: center; }
+.stage-tabs { overflow-x: auto; scrollbar-width: none; }
+.stage-tabs::-webkit-scrollbar { display: none; }
+.stage-tabs .seg { flex: 1 0 auto; justify-content: center; }
 .stage-body { flex: 1; overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
 .stage-body.fill { overflow: hidden; }
+/* görgethető panelben a tartalom ne nyomódjon össze (különben a térkép kilóg a gombok alá) */
+.stage-body:not(.fill) > * { flex-shrink: 0; }
+.cmap { flex: none; }
 .card { border-radius: 11px; background: var(--raised); border: 1px solid #1E2531; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
 .card-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 600; color: var(--fg-bright); font-size: 12.5px; }
 .card-title .sub { font: 400 11px var(--font-code); color: var(--accent); }
@@ -382,7 +387,11 @@ body.no-file #bottom, body.no-file .gutter[data-gutter="bottom"], body.no-file #
 body.flow #top, body.flow #rail, body.flow #side, body.flow #stage, body.flow #bottom, body.flow #status,
 body.flow .gutter, body.flow #toolbar, body.flow #tabs { display: none !important; }
 body.flow #editorWrap { margin: 0 auto; width: min(var(--flow-w, 1280px), 100%); }
-body.flow #center { padding-top: 48px; }
+body.flow #center { padding-top: 0; }
+body.flow #pulse { display: none; }
+/* a Flow-csík pár másodperc után elhalványul, és a képernyő tetejére mutatva visszajön */
+#flowPill { transition: opacity .4s, transform .4s; }
+#flowPill.idle { opacity: 0; transform: translate(-50%, -8px); pointer-events: none; }
 
 /* ── Monaco kiegészítések: Hibatolmács a sor alatt ── */
 .lens { margin: 3px 16px 4px 0; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; padding: 8px 12px; border-radius: 9px; background: var(--err-bg); border: 1px solid var(--err-line); font: 13px/1.5 var(--font-ui); color: #F1D9DC; box-sizing: border-box; max-width: 860px; }

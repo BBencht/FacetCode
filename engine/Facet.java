@@ -55,7 +55,7 @@ import java.util.stream.Stream;
 
 public class Facet {
 
-    static final String VERSION = "1.2.1";
+    static final String VERSION = "1.2.2";
     /** A megnyitott mappa (null, ha még nincs). */
     static volatile Path WS;
     /** A FACET saját adatai a megnyitott mappához (Időgép, fordítás, kuka) — nem a projektbe kerülnek. */

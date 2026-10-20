@@ -77,11 +77,13 @@
     zoom: 1, fontFamily: 'JetBrains Mono', lineHeight: 1.6, tabSize: 'auto', renderWhitespace: 'selection',
     cursorStyle: 'line', cursorBlinking: 'smooth', lineNumbers: 'on', bracketColors: true, stickyScroll: true, guides: true,
     quickSuggest: true, smoothScroll: true, autoClose: true, autosaveDelay: 900, saveOnBlur: false, trimTrailing: false,
-    finalNewline: false, formatOnSave: false, confirmDelete: true, confirmMove: true, termFontSize: 13, flowFullscreen: true, flowWidth: 'wide', keys: {}
+    finalNewline: false, formatOnSave: false, confirmDelete: true, confirmMove: true, termFontSize: 13, flowFullscreen: true, flowWidth: 'full', flowWidthV: 2, keys: {}
   };
   F.DEFAULTS = DEFAULTS;
   F.settings = Object.assign({}, DEFAULTS, store.get('settings', {}));
   F.saveSettings = () => store.set('settings', F.settings);
+  // 1.2.2: a Flow mód alapból a teljes szélességet használja
+  if (F.settings.flowWidthV !== 2) { F.settings.flowWidth = 'full'; F.settings.flowWidthV = 2; F.saveSettings(); }
 
   // ───────────── színek ─────────────
   function rgb(hex) { const n = parseInt(hex.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
@@ -549,6 +551,8 @@
     if (!tabs.find((t) => t.id === cur)) cur = tabs[0] && tabs[0].id;
     S.stageTab[S.facet] = cur;
     tabs.forEach((t) => wrap.append(h('button', { class: 'seg' + (t.id === cur ? ' active' : ''), onclick: () => F.showStage(t.id), html: typeof t.label === 'function' ? t.label() : esc(t.label) })));
+    const act = wrap.querySelector('.seg.active');
+    if (act) act.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
   F.renderStageTabs = renderStageTabs;
   F.showStage = (id) => {

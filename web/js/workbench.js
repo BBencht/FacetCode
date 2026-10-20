@@ -265,6 +265,11 @@
       return true;
     } catch (e) { return false; }
   }
+  // A Flow-csík elhalványul, ha nem mozog az egér a képernyő tetején.
+  let pillT = null;
+  const pillWake = () => { const p = $('#flowPill'); if (!p) return; p.classList.remove('idle'); clearTimeout(pillT); pillT = setTimeout(() => p.classList.add('idle'), 2500); };
+  window.addEventListener('mousemove', (e) => { if (document.body.classList.contains('flow') && e.clientY < 70) pillWake(); });
+  F.on('flow', (on) => { if (on) pillWake(); else { clearTimeout(pillT); const p = $('#flowPill'); if (p) p.classList.remove('idle'); } });
   F.on('flow', async (on) => {
     if (on && F.settings.flowFullscreen) flowFull = await setFullscreen(true);
     else if (!on && flowFull) { flowFull = false; await setFullscreen(false); }

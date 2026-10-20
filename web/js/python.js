@@ -1009,7 +1009,7 @@
     ],
     stage: [
       { id: 'tips', label: () => { const a = F.active(); const n = a ? (tips.get(a.path) || []).length + (syntax.get(a.path) || []).length : 0; return 'Tanácsok' + (n ? ` <span class="count">${n}</span>` : ''); }, render: tipsPanel },
-      { id: 'trace', label: 'Lépésenként', when: () => F.fs.mode === 'local', render: tracePanel },
+      { id: 'trace', label: 'Lépések', when: () => F.fs.mode === 'local', render: tracePanel },
       { id: 'map', label: 'Térkép', render: (b, a) => { mapPanel(b, a); } },
       { id: 'tests', label: () => { const t = PY.tests && PY.tests.list; const n = t ? t.filter((x) => x.status === 'fail').length : 0; return 'Tesztek' + (n ? ` <span class="count">${n}</span>` : ''); }, when: () => F.fs.mode === 'local', render: testsPanel },
       { id: 'pip', label: 'pip', when: () => F.fs.mode === 'local', render: (b, a) => { pipPanel(b, a); } },

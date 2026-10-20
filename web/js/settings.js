@@ -13,7 +13,7 @@
     { cat: 'look', id: 'zoom', type: 'range', label: 'Ablak nagyítása', desc: 'Az egész felület mérete. Billentyűvel: ' + (isMac ? '⌘ +, ⌘ −, ⌘ 0' : 'Ctrl + +, Ctrl + −, Ctrl + 0') + '.', min: 0.5, max: 2, step: 0.05, fmt: (v) => Math.round(v * 100) + '%', set: (v) => F.zoom.set(v, true), app: true },
     { cat: 'look', id: 'pulse', type: 'toggle', label: 'Pulzusvonal', desc: 'A szerkesztő feletti vonal a gépelés ritmusára világít.' },
     { cat: 'look', id: 'flowFullscreen', type: 'toggle', label: 'Flow mód teljes képernyőn', desc: 'A Flow mód (' + (isMac ? '⇧⌘M' : 'Shift+Ctrl+M') + ') az egész képernyőt kitölti. Kilépés: Esc.' },
-    { cat: 'look', id: 'flowWidth', type: 'select', label: 'Kódoszlop szélessége Flow módban', options: opts([['narrow', 'Keskeny (900 px)'], ['wide', 'Széles (1280 px)'], ['full', 'Teljes szélesség']]) },
+    { cat: 'look', id: 'flowWidth', type: 'select', label: 'Kódoszlop szélessége Flow módban', options: opts([['full', 'Teljes szélesség'], ['wide', 'Széles (1280 px)'], ['narrow', 'Keskeny (900 px)']]) },
     { cat: 'look', id: 'termFontSize', type: 'select', label: 'Terminál betűmérete', options: opts([11, 12, 13, 14, 15, 16].map((n) => [n, n + ' px'])) },
     // Szerkesztő
     { cat: 'editor', id: 'fontSize', type: 'select', label: 'Betűméret', desc: 'A Ctrl + görgő ideiglenesen is nagyít a szerkesztőben.', options: opts([11, 12, 13, 14, 15, 16, 17, 18, 20, 22, 24].map((n) => [n, n + ' px'])) },
