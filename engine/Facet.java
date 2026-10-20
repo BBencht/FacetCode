@@ -55,7 +55,7 @@ import java.util.stream.Stream;
 
 public class Facet {
 
-    static final String VERSION = "1.1.1";
+    static final String VERSION = "1.2.0";
     /** A megnyitott mappa (null, ha még nincs). */
     static volatile Path WS;
     /** A FACET saját adatai a megnyitott mappához (Időgép, fordítás, kuka) — nem a projektbe kerülnek. */
@@ -67,9 +67,10 @@ public class Facet {
     /** A külső programok (git, node, npm) környezete, a felhasználó teljes PATH-jával. */
     static volatile Map<String, String> ENV = new HashMap<>(System.getenv());
     static final java.util.concurrent.CountDownLatch ENV_READY = new java.util.concurrent.CountDownLatch(1);
-    static volatile String GIT_VER = null, NODE_VER = null, NPM_VER = null;
+    static volatile String GIT_VER = null, NODE_VER = null, NPM_VER = null, PY_VER = null;
+    static volatile List<String> PY_CMD = null;
     static final Map<String, Proc> PROCS = new ConcurrentHashMap<>();
-    static final Set<String> SKIP = Set.of(".facet", ".git", "node_modules", ".idea", ".vscode", "out", "target", ".DS_Store");
+    static final Set<String> SKIP = Set.of(".facet", ".git", "node_modules", ".idea", ".vscode", "out", "target", ".DS_Store", "__pycache__", ".venv", "venv", ".pytest_cache", ".mypy_cache");
     static final Pattern MAIN = Pattern.compile("static\\s+(public\\s+)?void\\s+main\\s*\\(|public\\s+static\\s+void\\s+main\\s*\\(");
     static final Pattern PKG = Pattern.compile("^\\s*package\\s+([\\w.]+)\\s*;", Pattern.MULTILINE);
 
@@ -182,6 +183,7 @@ public class Facet {
                     case "/api/ping": json(ex, 200, ping()); return;
                     case "/api/tools": detectTools(); json(ex, 200, ping()); return;
                     case "/api/openurl": openUrl(ex, one(q, "u")); return;
+                    case "/api/prefs": prefs(ex, method); return;
                     case "/api/git/identity": gitIdentity(ex, new String(readAll(ex.getRequestBody()), StandardCharsets.UTF_8)); return;
                     case "/api/browse": browse(ex, one(q, "path")); return;
                     case "/api/browse/mkdir": browseMkdir(ex, one(q, "path")); return;
@@ -208,6 +210,12 @@ public class Facet {
                     case "/api/proc/kill": { Proc p = PROCS.get(one(q, "id")); if (p != null) p.kill(); json(ex, 200, "{\"ok\":true}"); return; }
                     case "/api/run": runShell(ex, one(q, "cwd"), new String(readAll(ex.getRequestBody()), StandardCharsets.UTF_8)); return;
                     case "/api/node/run": runNode(ex, one(q, "path"), q.getOrDefault("arg", List.of())); return;
+                    case "/api/py/run": runPython(ex, one(q, "path"), q.getOrDefault("arg", List.of())); return;
+                    case "/api/py/info": pyInfo(ex, one(q, "path")); return;
+                    case "/api/py/check": pyCheck(ex, one(q, "path")); return;
+                    case "/api/py/format": pyFormat(ex, one(q, "path")); return;
+                    case "/api/py/trace": pyTrace(ex, one(q, "path")); return;
+                    case "/api/py/test": pyTest(ex, one(q, "path"), one(q, "only")); return;
                     case "/api/git/repos": gitRepos(ex); return;
                     case "/api/git/status": gitStatus(ex, one(q, "repo")); return;
                     case "/api/git/log": gitLog(ex, one(q, "repo")); return;
@@ -275,6 +283,28 @@ public class Facet {
         WS = dir;
     }
 
+    /** A felület beállításai (~/.facet/prefs.json). Az asztali alkalmazás minden indításkor más
+        porton fut, ezért a böngésző saját tárolója (localStorage) nem maradna meg — ide mentünk. */
+    static final Object PREFS_LOCK = new Object();
+    static void prefs(HttpExchange ex, String method) throws IOException {
+        Path f = HOME.resolve(".facet").resolve("prefs.json");
+        synchronized (PREFS_LOCK) {
+            if (method.equals("PUT")) {
+                byte[] body = readAll(ex.getRequestBody());
+                if (body.length > 8_000_000) { json(ex, 413, "{\"error\":\"Túl nagy\"}"); return; }
+                Files.createDirectories(f.getParent());
+                Path tmp = f.resolveSibling("prefs.json.tmp");
+                Files.write(tmp, body);
+                Files.move(tmp, f, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+                json(ex, 200, "{\"ok\":true}");
+                return;
+            }
+            String body = Files.exists(f) ? new String(Files.readAllBytes(f), StandardCharsets.UTF_8) : "{}";
+            if (!body.trim().startsWith("{")) body = "{}";
+            json(ex, 200, body);
+        }
+    }
+
     static String ping() {
         boolean jdk = ToolProvider.getSystemJavaCompiler() != null;
         Path ws = WS;
@@ -283,7 +313,7 @@ public class Facet {
                 + ",\"name\":" + (ws == null ? "null" : q(ws.getFileName() == null ? ws.toString() : ws.getFileName().toString()))
                 + ",\"project\":" + isProject(ws)
                 + ",\"home\":" + q(HOME.toString()) + ",\"projects\":" + q(HOME.resolve("FacetProjects").toString())
-                + ",\"git\":" + q(GIT_VER) + ",\"node\":" + q(NODE_VER) + ",\"npm\":" + q(NPM_VER)
+                + ",\"git\":" + q(GIT_VER) + ",\"node\":" + q(NODE_VER) + ",\"npm\":" + q(NPM_VER) + ",\"python\":" + q(PY_VER)
                 + ",\"sep\":" + q(File.separator)
                 + ",\"os\":" + q(System.getProperty("os.name")) + "}";
     }
@@ -767,6 +797,8 @@ public class Facet {
         if (GIT_VER != null && GIT_VER.isBlank()) GIT_VER = null;
         if (NODE_VER != null && NODE_VER.isBlank()) NODE_VER = null;
         if (NPM_VER != null && NPM_VER.isBlank()) NPM_VER = null;
+        PY_CMD = systemPython();
+        PY_VER = PY_CMD == null ? null : pyVersion(PY_CMD);
     }
 
     static String firstLine(String s) { return s == null ? "" : s.trim().split("\\R", 2)[0]; }
@@ -807,6 +839,170 @@ public class Facet {
         String id = UUID.randomUUID().toString();
         PROCS.put(id, proc);
         json(ex, 200, "{\"ok\":true,\"id\":" + q(id) + ",\"node\":" + q(NODE_VER) + "}");
+    }
+
+    // ───────────────────────────── Python ─────────────────────────────
+
+    /** „Python 3.12.1” → „3.12.1”; ha a parancs nem igazi Python (pl. a Windows Store-os álparancs): null. */
+    static String pyVersion(List<String> base) {
+        List<String> c = new ArrayList<>(base); c.add("--version");
+        Out o = exec(c, null, null, 10);
+        String v = firstLine((o.out + "\n" + o.err).trim());
+        return o.code == 0 && v.startsWith("Python 3") ? v.substring(7).trim() : null;
+    }
+
+    /** A gépen lévő Python 3: python3, python, Windowson a py indító is. */
+    static List<String> systemPython() {
+        List<List<String>> tries = new ArrayList<>();
+        String p3 = which("python3"), p = which("python"), py = WIN ? which("py") : null;
+        if (WIN && py != null) tries.add(List.of(py, "-3"));
+        if (p3 != null) tries.add(List.of(p3));
+        if (p != null) tries.add(List.of(p));
+        for (List<String> t : tries) if (pyVersion(t) != null) return t;
+        return null;
+    }
+
+    /** A fájlhoz tartozó virtuális környezet (.venv, venv, env) a fájl mappájától a megnyitott mappáig. */
+    static Path findVenv(Path from) {
+        for (Path d = from; d != null && d.startsWith(WS); d = d.getParent()) {
+            for (String n : new String[]{".venv", "venv", "env"}) {
+                Path exe = WIN ? d.resolve(n).resolve("Scripts").resolve("python.exe") : d.resolve(n).resolve("bin").resolve("python");
+                if (Files.isRegularFile(exe)) return exe;
+            }
+            if (d.equals(WS)) break;
+        }
+        return null;
+    }
+
+    static List<String> pythonFor(Path dir) {
+        Path v = dir == null ? null : findVenv(dir);
+        if (v != null) return List.of(v.toString());
+        if (PY_CMD == null) { awaitEnv(); PY_CMD = systemPython(); PY_VER = PY_CMD == null ? null : pyVersion(PY_CMD); }
+        return PY_CMD;
+    }
+
+    static ProcessBuilder pyProc(List<String> cmd, Path dir) {
+        ProcessBuilder pb = proc(cmd, dir);
+        pb.environment().put("PYTHONUNBUFFERED", "1");
+        pb.environment().put("PYTHONIOENCODING", "utf-8");
+        pb.environment().put("PYTHONUTF8", "1");
+        pb.environment().put("PYTHONDONTWRITEBYTECODE", "1");
+        return pb;
+    }
+
+    static void runPython(HttpExchange ex, String relPath, List<String> args) throws IOException {
+        Path file = resolve(relPath);
+        List<String> py = pythonFor(file.getParent());
+        if (py == null) { json(ex, 200, "{\"ok\":false,\"error\":\"nopython\"}"); return; }
+        PROCS.values().forEach(Proc::kill);
+        PROCS.clear();
+        List<String> cmd = new ArrayList<>(py);
+        cmd.add("-u");
+        cmd.add(file.getFileName().toString());
+        cmd.addAll(args);
+        Proc proc = new Proc(pyProc(cmd, file.getParent()).start());
+        String id = UUID.randomUUID().toString();
+        PROCS.put(id, proc);
+        json(ex, 200, "{\"ok\":true,\"id\":" + q(id) + ",\"cmd\":" + q(String.join(" ", cmd)) + "}");
+    }
+
+    /** Python-információ egy fájlhoz: melyik értelmező, verzió, venv, pip-parancs. */
+    static void pyInfo(HttpExchange ex, String relPath) throws IOException {
+        Path dir = relPath == null || relPath.isEmpty() ? WS : resolve(relPath);
+        if (!Files.isDirectory(dir)) dir = dir.getParent();
+        Path venv = findVenv(dir);
+        List<String> py = pythonFor(dir);
+        String ver = py == null ? null : (venv == null ? PY_VER : pyVersion(py));
+        String cmdline = py == null ? null : py.stream().map(x -> x.contains(" ") ? "\"" + x + "\"" : x).collect(java.util.stream.Collectors.joining(" "));
+        json(ex, 200, "{\"ok\":true,\"python\":" + q(cmdline) + ",\"version\":" + q(ver)
+                + ",\"venv\":" + (venv == null ? "null" : q(WS.relativize(venv).toString().replace('\\', '/'))) + "}");
+    }
+
+    /** Szintaxis-ellenőrzés futtatás nélkül (ast.parse). */
+    static void pyCheck(HttpExchange ex, String relPath) throws IOException {
+        Path file = resolve(relPath);
+        List<String> py = pythonFor(file.getParent());
+        if (py == null) { json(ex, 200, "{\"ok\":false,\"error\":\"nopython\"}"); return; }
+        List<String> cmd = new ArrayList<>(py);
+        cmd.addAll(List.of("-c", "import ast,sys\nsrc=open(sys.argv[1],encoding='utf-8').read()\ntry:\n ast.parse(src,sys.argv[1])\nexcept SyntaxError as e:\n print('%s|%s|%s|%s'%(e.__class__.__name__,e.lineno or 0,e.offset or 0,e.msg))\n", file.toString()));
+        Out o = exec(cmd, file.getParent(), null, 15);
+        json(ex, 200, "{\"ok\":true,\"out\":" + q(o.out.trim()) + ",\"err\":" + q(o.err.trim()) + "}");
+    }
+
+    /** Lépésenkénti futtatás: a felület mappájában lévő nyomkövetővel (web/py/facet_tracer.py). */
+    static void pyTrace(HttpExchange ex, String relPath) throws IOException {
+        byte[] inputs = readAll(ex.getRequestBody());
+        Path file = resolve(relPath);
+        List<String> py = pythonFor(file.getParent());
+        if (py == null) { json(ex, 200, "{\"ok\":false,\"error\":\"nopython\"}"); return; }
+        Path tracer = WEB.resolve("py").resolve("facet_tracer.py");
+        if (!Files.isRegularFile(tracer)) { json(ex, 500, "{\"error\":\"Hiányzik a nyomkövető\"}"); return; }
+        List<String> cmd = new ArrayList<>(py);
+        cmd.addAll(List.of(tracer.toString(), file.toString(), WS.toString(), "800"));
+        Out o = new Out();
+        try {
+            Process p = pyProc(cmd, file.getParent()).start();
+            try (OutputStream os = p.getOutputStream()) { os.write(inputs); }
+            ByteArrayOutputStream bo = new ByteArrayOutputStream(), be = new ByteArrayOutputStream();
+            Thread t1 = new Thread(() -> { try { p.getInputStream().transferTo(bo); } catch (IOException ignored) { } });
+            Thread t2 = new Thread(() -> { try { p.getErrorStream().transferTo(be); } catch (IOException ignored) { } });
+            t1.start(); t2.start();
+            if (!p.waitFor(20, TimeUnit.SECONDS)) { p.destroyForcibly(); o.timeout = true; }
+            t1.join(2000); t2.join(2000);
+            o.out = bo.toString(StandardCharsets.UTF_8); o.err = be.toString(StandardCharsets.UTF_8);
+        } catch (Exception e) { o.err = String.valueOf(e.getMessage()); }
+        String out = o.out.trim();
+        int i = out.lastIndexOf("\n{\"steps\"");
+        if (i >= 0) out = out.substring(i + 1);
+        if (o.timeout) { json(ex, 200, "{\"ok\":false,\"error\":\"timeout\"}"); return; }
+        if (!out.startsWith("{")) { json(ex, 200, "{\"ok\":false,\"error\":" + q(o.err.isEmpty() ? out : o.err) + "}"); return; }
+        json(ex, 200, out);
+    }
+
+    /** Tesztek futtatása: pytest, ha telepítve van, különben unittest. */
+    static void pyTest(HttpExchange ex, String rel, String only) throws IOException {
+        Path dir = rel == null || rel.isEmpty() ? WS : resolve(rel);
+        if (!Files.isDirectory(dir)) dir = dir.getParent();
+        List<String> py = pythonFor(dir);
+        if (py == null) { json(ex, 200, "{\"ok\":false,\"error\":\"nopython\"}"); return; }
+        List<String> probe = new ArrayList<>(py); probe.addAll(List.of("-m", "pytest", "--version"));
+        boolean pytest = exec(probe, dir, null, 20).code == 0;
+        List<String> cmd = new ArrayList<>(py);
+        if (pytest) {
+            cmd.addAll(List.of("-m", "pytest", "-q", "-rA", "--tb=short", "--no-header", "-p", "no:cacheprovider", "--color=no"));
+            if (only != null && only.matches("[\\w./:\\[\\]-]+")) cmd.add(only);
+        } else {
+            cmd.addAll(List.of("-m", "unittest", "discover", "-v", "-p", "*test*.py"));
+        }
+        long t0 = System.currentTimeMillis();
+        Out o = new Out();
+        try {
+            Process p = pyProc(cmd, dir).start();
+            p.getOutputStream().close();
+            ByteArrayOutputStream bo = new ByteArrayOutputStream(), be = new ByteArrayOutputStream();
+            Thread t1 = new Thread(() -> { try { p.getInputStream().transferTo(bo); } catch (IOException ignored) { } });
+            Thread t2 = new Thread(() -> { try { p.getErrorStream().transferTo(be); } catch (IOException ignored) { } });
+            t1.start(); t2.start();
+            if (!p.waitFor(180, TimeUnit.SECONDS)) { p.destroyForcibly(); o.timeout = true; }
+            t1.join(2000); t2.join(2000);
+            o.code = o.timeout ? -1 : p.exitValue();
+            o.out = bo.toString(StandardCharsets.UTF_8); o.err = be.toString(StandardCharsets.UTF_8);
+        } catch (Exception e) { o.err = String.valueOf(e.getMessage()); }
+        json(ex, 200, "{\"ok\":true,\"tool\":" + q(pytest ? "pytest" : "unittest") + ",\"code\":" + o.code + ",\"ms\":" + (System.currentTimeMillis() - t0)
+                + ",\"timeout\":" + o.timeout + ",\"dir\":" + q(WS.relativize(dir).toString().replace('\\', '/')) + ",\"cmd\":" + q(String.join(" ", cmd.subList(py.size(), cmd.size()))) + ",\"out\":" + q(o.out) + ",\"err\":" + q(o.err) + "}");
+    }
+
+    /** Formázás black-kel (ha telepítve van): a szöveg a kérés törzsében. */
+    static void pyFormat(HttpExchange ex, String relPath) throws IOException {
+        byte[] body = readAll(ex.getRequestBody());
+        Path dir = relPath == null ? WS : resolve(relPath).getParent();
+        List<String> py = pythonFor(dir);
+        if (py == null) { json(ex, 200, "{\"ok\":false,\"error\":\"nopython\"}"); return; }
+        List<String> cmd = new ArrayList<>(py);
+        cmd.addAll(List.of("-m", "black", "-q", "-"));
+        Out o = exec(cmd, dir, body, 30);
+        if (o.code != 0) { json(ex, 200, "{\"ok\":false,\"error\":" + q(o.err.contains("No module named") ? "noblack" : o.err.trim()) + "}"); return; }
+        json(ex, 200, "{\"ok\":true,\"text\":" + q(o.out) + "}");
     }
 
     /** Külső hivatkozás megnyitása a rendszer böngészőjében (az asztali alkalmazásból). */

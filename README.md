@@ -9,13 +9,14 @@
 <img alt="Windows 10/11" src="https://img.shields.io/badge/Windows_10%2F11-161C27?style=for-the-badge">
 <img alt="Linux" src="https://img.shields.io/badge/Linux-161C27?style=for-the-badge&logo=linux&logoColor=F5C451">
 <img alt="Java 11+" src="https://img.shields.io/badge/Java-11%2B-4DA3FF?style=for-the-badge&labelColor=161C27">
+<img alt="Python 3" src="https://img.shields.io/badge/Python-3-2EC4B6?style=for-the-badge&labelColor=161C27">
 <a href="https://github.com/BBencht/FacetCode/actions"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/BBencht/FacetCode/build.yml?branch=main&style=for-the-badge&label=build&labelColor=161C27"></a>
 <a href="LICENSE"><img alt="MIT licenc" src="https://img.shields.io/badge/licenc-MIT-6FD3C1?style=for-the-badge&labelColor=161C27"></a>
 
 <h3>A fejlesztői környezet, ami átalakul ahhoz, amin épp dolgozol.</h3>
 
-Nyiss meg egy `.java` fájlt, és Java-eszközöket kapsz. Egy `.html`-nél élő előnézetet,<br>
-egy `.docx`-nél szövegszerkesztőt. Az eszköztár, a panelek, a színek és a parancsok<br>
+Nyiss meg egy `.java` fájlt, és Java-eszközöket kapsz. Egy `.py`-nál lépésenkénti futtatást,<br>
+egy `.html`-nél élő előnézetet, egy `.docx`-nél szövegszerkesztőt. Az eszköztár, a panelek, a színek és a parancsok<br>
 mindig a fájl típusához igazodnak, és **minden magyarul szól hozzád.**
 
 <br>
@@ -32,9 +33,9 @@ mindig a fájl típusához igazodnak, és **minden magyarul szól hozzád.**
 
 <a id="funkciok"></a>
 
-## ◆ Egy IDE, hat arc
+## ◆ Egy IDE, sok arc
 
-<img src="docs/facets.svg" alt="Java, HTML, CSS, JavaScript, Git és Dokumentum facet" width="100%">
+<img src="docs/facets.svg" alt="Java, Python, HTML, CSS, JavaScript, Git, Dokumentum és testreszabás" width="100%">
 
 > [!TIP]
 > Nem kell semmit átállítanod. A FACET a fájl kiterjesztéséből tudja, mire van szükséged, és a felület egy pillanat alatt átalakul. A <kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd> parancspaletta mindig az aktuális facet parancsait mutatja elöl, és érti, ha magyarul keresel: „getter”, „új osztály”, „formázd”.
@@ -63,6 +64,33 @@ mindig a fájl típusához igazodnak, és **minden magyarul szól hozzád.**
 | 📐 **UML-export** | Egy gombnyomással `.uxf` diagram UMLethez és UMLetinóhoz: mezők, metódusok, láthatóság, kapcsolatok. |
 | ⚙️ **Generátorok** | Getter/setter, konstruktor, `toString()`, `equals()`/`hashCode()`, `main`, új osztály, interfész, enum, record. |
 | ✍️ **Kódírás** | Kiegészítés automatikus importtal, sablonok (`sout`, `psvm`, `fori`, `scanner`, `readint`…), formázó. |
+
+</details>
+
+<br>
+
+## 🐍 Python
+
+<img src="docs/screens/python.png" alt="Lépésenkénti futtatás: a futó sor kiemelve, mellette a függvényhívások és a változók értékei" width="100%">
+
+**Lépésenkénti futtatás:** csúszkával lépkedhetsz előre és hátra a programban. Látod, melyik sor fut, milyen függvényhívásokban vagy, és mi van épp a változókban (a változás kiemelve). Az `input()`-ra adott válaszokat előre megadhatod.
+
+<details>
+<summary><b>Az összes Python-funkció</b></summary>
+<br>
+
+| | |
+|---|---|
+| ▶️ **Futtatás** | Interaktív terminál: az `input()`-ra közvetlenül válaszolsz. Ha van a projektben `.venv`, azzal fut. |
+| 🩺 **Traceback magyarul** | `IndentationError`, `NameError`, `TypeError: can only concatenate str…`, `ValueError: invalid literal for int()`, hiányzó modul… — magyar magyarázat, és ugrás a hibás sorra. |
+| ✅ **Élő ellenőrzés** | Mentéskor szintaxis-ellenőrzés futtatás nélkül, a hiba azonnal piros. |
+| 💡 **Tanácsok javítással** | `== None` → `is None`, módosítható alapérték, csupasz `except:`, tab/szóköz keveredés, `"Szia " + nev` → f-string, fel nem használt import, beépített név felülírása… |
+| 🧭 **Térkép és UML** | Modulok, osztályok, öröklés és használat diagramon; exportálás `.uxf`-be (UMLet). |
+| 🧪 **Tesztek** | `pytest` vagy `unittest` egy kattintással: zöld/piros lista, „ezt adta – ezt várta” magyarázat, ugrás a hibás tesztre. Tesztfájlt is generál. |
+| ✍️ **Generátorok** | Docstring, `__init__` a mezőkből, `__repr__`, getter/setter (`@property`), átalakítás `@dataclass`-szá. |
+| 📦 **pip-panel** | Csomag telepítése, `requirements.txt` kezelése, `.venv` létrehozása egy gombbal. |
+| 🐚 **Konzol** | Python-konzol (REPL) a terminálban, vagy „futtatás, utána konzol” (`python -i`). |
+| 🖌️ **Formázás** | `black`-kel, ha telepítve van (ha nincs, felajánlja a telepítését). |
 
 </details>
 
@@ -189,7 +217,27 @@ A FACET semmit nem ír a mappáidba: az Időgép, a fordítás és a kuka a `~/.
 
 </td>
 </tr>
+<tr>
+<td valign="top">
+
+**🖱️ Húzd és ejtsd**<br>
+Fájlok és mappák áthelyezése a fában húzással, fájlok behúzása a Finderből/Intézőből, fülek átrendezése.
+
+</td>
+<td valign="top">
+
+**↩️ Vissza az előző helyre**<br>
+Az egér vissza/előre gombja (és <kbd>Alt</kbd> <kbd>←</kbd>) a kódban lépked vissza oda, ahol jártál.
+
+</td>
+</tr>
 </table>
+
+<br>
+
+<img src="docs/screens/settings.png" alt="Beállítások oldal kategóriákkal és átírható billentyűparancsokkal" width="100%">
+
+**Beállítások** (<kbd>⌘</kbd> <kbd>,</kbd> / <kbd>Ctrl</kbd> <kbd>,</kbd>): kereshető oldal kategóriákkal — megjelenés, szerkesztő, mentés, Java, Python —, **átírható billentyűparancsokkal**, ütközésfigyeléssel, exporttal és importtal. Az ablak nagyítható: <kbd>Ctrl</kbd> <kbd>+</kbd> / <kbd>−</kbd> / <kbd>0</kbd>.
 
 <br>
 
@@ -205,8 +253,8 @@ A FACET semmit nem ír a mappáidba: az Időgép, a fordítás és a kuka a `~/.
 
 | | Rendszer | Fájl |
 |:---:|---|---|
-| 🍎 | **macOS** · Apple Silicon és Intel | `FACET_1.1.1_universal.dmg` |
-| 🪟 | **Windows 10 / 11** | `FACET_1.1.1_x64-setup.exe` vagy `.msi` |
+| 🍎 | **macOS** · Apple Silicon és Intel | `FACET_1.2.0_universal.dmg` |
+| 🪟 | **Windows 10 / 11** | `FACET_1.2.0_x64-setup.exe` vagy `.msi` |
 | 🐧 | **Linux** | `.AppImage`, `.deb` (Ubuntu, Debian) vagy `.rpm` (Fedora) |
 
 ### Három lépés, és kész
@@ -267,7 +315,12 @@ Kattints a **További információ**, majd a **Futtatás mindenképp** gombra. E
 | Keresés a projektben | <kbd>⇧</kbd> <kbd>⌘</kbd> <kbd>F</kbd> | <kbd>Shift</kbd> <kbd>Ctrl</kbd> <kbd>F</kbd> |
 | Formázás | <kbd>⇧</kbd> <kbd>⌥</kbd> <kbd>F</kbd> | <kbd>Shift</kbd> <kbd>Alt</kbd> <kbd>F</kbd> |
 | Bal · jobb · alsó panel | <kbd>⌘</kbd> <kbd>B</kbd> · <kbd>⌥</kbd> <kbd>⌘</kbd> <kbd>B</kbd> · <kbd>⌘</kbd> <kbd>J</kbd> | <kbd>Ctrl</kbd> <kbd>B</kbd> · <kbd>Alt</kbd> <kbd>Ctrl</kbd> <kbd>B</kbd> · <kbd>Ctrl</kbd> <kbd>J</kbd> |
-| Flow mód | <kbd>⇧</kbd> <kbd>⌘</kbd> <kbd>M</kbd> | <kbd>Shift</kbd> <kbd>Ctrl</kbd> <kbd>M</kbd> |
+| Flow mód (teljes képernyő) | <kbd>⇧</kbd> <kbd>⌘</kbd> <kbd>M</kbd> | <kbd>Shift</kbd> <kbd>Ctrl</kbd> <kbd>M</kbd> |
+| Vissza · előre a kódban | <kbd>⌃</kbd> <kbd>-</kbd> · <kbd>⌃</kbd> <kbd>⇧</kbd> <kbd>-</kbd> | <kbd>Alt</kbd> <kbd>←</kbd> · <kbd>Alt</kbd> <kbd>→</kbd> |
+| Ablak nagyítása | <kbd>⌘</kbd> <kbd>+</kbd> · <kbd>⌘</kbd> <kbd>−</kbd> · <kbd>⌘</kbd> <kbd>0</kbd> | <kbd>Ctrl</kbd> <kbd>+</kbd> · <kbd>Ctrl</kbd> <kbd>−</kbd> · <kbd>Ctrl</kbd> <kbd>0</kbd> |
+| Beállítások | <kbd>⌘</kbd> <kbd>,</kbd> | <kbd>Ctrl</kbd> <kbd>,</kbd> |
+
+Mindegyik átírható a **Beállítások → Billentyűparancsok** oldalon.
 
 <br>
 
@@ -281,13 +334,14 @@ flowchart LR
     B --> D["☕ javac · java"]
     B --> E["🌿 git"]
     B --> F["⚡ node · npm"]
+    B --> H["🐍 python · pip"]
     B --> G["📁 a mappáid"]
 ```
 
 | Réteg | Mi ez? |
 |---|---|
 | **Tauri-héj** · `src-tauri/` | Vékony Rust-réteg: megkeresi a Javát, elindítja a motort, megnyitja az ablakot. A rendszer saját böngészőmotorját használja, ezért a telepítő csak néhány MB. |
-| **Motor** · `engine/Facet.java` | Egyetlen Java-fájl, külső függőség nélkül. Ez kezeli a fájlokat, a fordítást, a futtatást, a Gitet, a Node-ot és a `.docx` fájlokat. Csak a saját gépről és csak a FACET felületéről fogad kéréseket. |
+| **Motor** · `engine/Facet.java` | Egyetlen Java-fájl, külső függőség nélkül. Ez kezeli a fájlokat, a fordítást, a futtatást, a Gitet, a Node-ot, a Pythont és a `.docx` fájlokat. Csak a saját gépről és csak a FACET felületéről fogad kéréseket. |
 | **Felület** · `web/` | Sima HTML, CSS és JavaScript, keretrendszer nélkül. Minden fájltípus egy facet modul, így egy új nyelv egy új fájl. |
 
 <br>
@@ -327,7 +381,7 @@ FacetCode/
 └── .github/workflows/         build macOS-re, Windowsra, Linuxra
 ```
 
-Minden push után a GitHub Actions elkészíti a három rendszer telepítőit. Egy `v*` címkével (pl. `v1.1.1`) létrehozott kiadáshoz a telepítők automatikusan felkerülnek.
+Minden push után a GitHub Actions elkészíti a három rendszer telepítőit. Egy `v*` címkével (pl. `v1.2.0`) létrehozott kiadáshoz a telepítők automatikusan felkerülnek.
 </details>
 
 <br>
@@ -335,6 +389,21 @@ Minden push után a GitHub Actions elkészíti a három rendszer telepítőit. E
 ## 📜 Változásnapló
 
 <details open>
+<summary><b>1.2.0</b> · Python, átírható billentyűk, húzd és ejtsd</summary>
+<br>
+
+- **Python facet:** futtatás `input()`-tal, magyar Traceback-magyarázat, élő szintaxis-ellenőrzés, tanácsok gyors javítással, **lépésenkénti futtatás változókkal**, térkép és UML-export, tesztek (pytest/unittest), generátorok, pip/venv panel, konzol, black-formázás, Python-mintaprojekt.
+- **Új Beállítások oldal:** keresés, kategóriák, rendszerinformáció, export/import — és **átírható billentyűparancsok** ütközésfigyeléssel.
+- **Ablak nagyítása:** <kbd>Ctrl</kbd> <kbd>+</kbd> / <kbd>−</kbd> / <kbd>0</kbd> (a <kbd>Ctrl</kbd> + görgő továbbra is a szerkesztőt nagyítja).
+- **Húzd és ejtsd:** áthelyezés a fájlfában (Java-fájlnál a `package` sort is frissíti), fájlok behúzása a gépről, fülek átrendezése.
+- **Az egér vissza/előre gombja** a kódban lépked, nem lép ki a szerkesztőből.
+- **Flow mód teljes képernyőn**, állítható szélességgel.
+- Az új fájlok nem kapnak alapból megjegyzést.
+- A beállítások újraindítás után is megmaradnak (`~/.facet/prefs.json`).
+- Magyar billentyűzeten az AltGr-rel írt jelek (`{ } [ ] @`) többé nem indítanak parancsot.
+</details>
+
+<details>
 <summary><b>1.1.1</b> · Windows-javítás</summary>
 <br>
 
@@ -377,6 +446,6 @@ A FACET [MIT-licenc](LICENSE) alatt érhető el: szabadon használhatod, módos�
 
 <br><br>
 
-<sub>Készült ◆ Magyarországon · <b>FACET 1.1.1</b> · <a href="https://github.com/BBencht">@BBencht</a></sub>
+<sub>Készült ◆ Magyarországon · <b>FACET 1.2.0</b> · <a href="https://github.com/BBencht">@BBencht</a></sub>
 
 </div>

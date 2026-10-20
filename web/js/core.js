@@ -37,13 +37,49 @@
   F.emit = (ev, ...a) => { (bus[ev] || []).forEach((fn) => { try { fn(...a); } catch (e) { console.error(e); } }); };
 
   // ───────────── tárolás ─────────────
+  // Az asztali alkalmazás minden indításkor más porton fut, így a böngésző tárolója (localStorage)
+  // nem maradna meg. Ezért a beállítások a motorhoz kerülnek (~/.facet/prefs.json); ha nincs motor,
+  // marad a localStorage.
+  const PREFS = (() => {
+    try {
+      const x = new XMLHttpRequest();
+      x.open('GET', '/api/prefs', false);
+      x.setRequestHeader('X-Facet', '1');
+      x.send();
+      if (x.status === 200) return JSON.parse(x.responseText || '{}');
+    } catch (e) { /* demó mód */ }
+    return null;
+  })();
+  if (PREFS && !Object.keys(PREFS).length) {
+    // első indítás az új tárolóval: átvesszük, ami a böngészőben volt
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith('facet.') && k !== 'facet.demofs') PREFS[k.slice(6)] = JSON.parse(localStorage.getItem(k)); } } catch (e) { /* nincs */ }
+  }
+  const pushPrefs = (() => {
+    let t = null;
+    const send = () => { t = null; try { fetch('/api/prefs', { method: 'PUT', headers: { 'X-Facet': '1' }, body: JSON.stringify(PREFS), keepalive: true }); } catch (e) { /* később újra */ } };
+    window.addEventListener('beforeunload', () => { if (t) { clearTimeout(t); send(); } });
+    return () => { if (!t) t = setTimeout(send, 400); };
+  })();
   const store = {
-    get(k, d) { try { const v = localStorage.getItem('facet.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
-    set(k, v) { try { localStorage.setItem('facet.' + k, JSON.stringify(v)); } catch (e) { /* tele vagy tiltott */ } }
+    get(k, d) {
+      if (PREFS && k !== 'demofs') return Object.prototype.hasOwnProperty.call(PREFS, k) ? JSON.parse(JSON.stringify(PREFS[k])) : d;
+      try { const v = localStorage.getItem('facet.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; }
+    },
+    set(k, v) {
+      if (PREFS && k !== 'demofs') { PREFS[k] = JSON.parse(JSON.stringify(v)); pushPrefs(); return; }
+      try { localStorage.setItem('facet.' + k, JSON.stringify(v)); } catch (e) { /* tele vagy tiltott */ }
+    }
   };
   F.store = store;
 
-  const DEFAULTS = { fontSize: 14, autosave: true, minimap: false, wrap: false, pulse: true, lens: true, liveCheck: true, ligatures: true };
+  const DEFAULTS = {
+    fontSize: 14, autosave: true, minimap: false, wrap: false, pulse: true, lens: true, liveCheck: true, ligatures: true,
+    zoom: 1, fontFamily: 'JetBrains Mono', lineHeight: 1.6, tabSize: 'auto', renderWhitespace: 'selection',
+    cursorStyle: 'line', cursorBlinking: 'smooth', lineNumbers: 'on', bracketColors: true, stickyScroll: true, guides: true,
+    quickSuggest: true, smoothScroll: true, autoClose: true, autosaveDelay: 900, saveOnBlur: false, trimTrailing: false,
+    finalNewline: false, formatOnSave: false, confirmDelete: true, confirmMove: true, termFontSize: 13, flowFullscreen: true, flowWidth: 'wide', keys: {}
+  };
+  F.DEFAULTS = DEFAULTS;
   F.settings = Object.assign({}, DEFAULTS, store.get('settings', {}));
   F.saveSettings = () => store.set('settings', F.settings);
 
@@ -59,6 +95,7 @@
     css: { label: 'CSS', accent: '#4DA3FF', exts: ['css'], lang: 'css', icon: '#', tab: 2 },
     js: { label: 'JavaScript', accent: '#F5C451', exts: ['js', 'mjs', 'cjs', 'jsx', 'ts', 'tsx'], lang: 'javascript', icon: 'JS', tab: 2 },
     doc: { label: 'Dokumentum', accent: '#E6D3B3', exts: ['txt', 'docx', 'doc', 'rtf', 'odt'], lang: 'plaintext', icon: 'W', tab: 4 },
+    py: { label: 'Python', accent: '#2EC4B6', exts: ['py', 'pyw'], lang: 'python', icon: 'Py', tab: 4 },
     json: { label: 'JSON', accent: '#A78BFA', exts: ['json'], lang: 'json', icon: '{}', tab: 2 },
     md: { label: 'Markdown', accent: '#8FD3A8', exts: ['md', 'markdown'], lang: 'markdown', icon: 'M', tab: 2 },
     text: { label: 'Szöveg', accent: '#9AA6B8', exts: [], lang: 'plaintext', icon: 'T', tab: 4 }
@@ -303,6 +340,7 @@
   F.confirm = (title, text, ok, danger) => F.dialog({ title, text, ok: ok || 'Rendben', danger }).then((v) => !!v);
 
   // ───────────── helyi menü ─────────────
+  F.hideMenu = () => hideMenu();
   F.menu = (x, y, items) => {
     const m = $('#menu');
     m.innerHTML = '';
@@ -424,17 +462,18 @@
   function editorOptions() {
     const s = F.settings;
     return {
-      fontFamily: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
-      fontSize: s.fontSize, lineHeight: Math.round(s.fontSize * 1.6), fontLigatures: s.ligatures,
+      fontFamily: '"' + (s.fontFamily || 'JetBrains Mono') + '", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+      fontSize: s.fontSize, lineHeight: Math.round(s.fontSize * (s.lineHeight || 1.6)), fontLigatures: s.ligatures,
       minimap: { enabled: s.minimap, renderCharacters: false, scale: 1 }, wordWrap: s.wrap ? 'on' : 'off',
-      smoothScrolling: true, cursorBlinking: 'smooth', cursorSmoothCaretAnimation: 'on',
-      padding: { top: 14, bottom: 14 }, renderLineHighlight: 'all', scrollBeyondLastLine: false,
-      bracketPairColorization: { enabled: true }, guides: { bracketPairs: 'active', indentation: true },
-      stickyScroll: { enabled: true }, glyphMargin: true, folding: true, lineNumbersMinChars: 4,
-      fixedOverflowWidgets: true, automaticLayout: true, tabSize: 4, insertSpaces: true,
-      suggest: { preview: true, showStatusBar: false }, quickSuggestions: { other: true, comments: false, strings: false },
-      parameterHints: { enabled: true }, formatOnPaste: false, linkedEditing: true, renderWhitespace: 'selection',
-      scrollbar: { verticalScrollbarSize: 10, horizontalScrollbarSize: 10 }, overviewRulerBorder: false,
+      smoothScrolling: s.smoothScroll, cursorBlinking: s.cursorBlinking, cursorSmoothCaretAnimation: s.smoothScroll ? 'on' : 'off', cursorStyle: s.cursorStyle,
+      padding: { top: 14, bottom: 14 }, renderLineHighlight: 'all', scrollBeyondLastLine: false, lineNumbers: s.lineNumbers,
+      bracketPairColorization: { enabled: s.bracketColors }, guides: { bracketPairs: s.guides ? 'active' : false, indentation: s.guides },
+      stickyScroll: { enabled: s.stickyScroll }, glyphMargin: true, folding: true, lineNumbersMinChars: 4,
+      fixedOverflowWidgets: true, automaticLayout: true, insertSpaces: true,
+      suggest: { preview: true, showStatusBar: false }, quickSuggestions: s.quickSuggest ? { other: true, comments: false, strings: false } : false,
+      autoClosingBrackets: s.autoClose ? 'languageDefined' : 'never', autoClosingQuotes: s.autoClose ? 'languageDefined' : 'never',
+      parameterHints: { enabled: true }, formatOnPaste: false, linkedEditing: true, renderWhitespace: s.renderWhitespace,
+      scrollbar: { verticalScrollbarSize: 10, horizontalScrollbarSize: 10 }, overviewRulerBorder: false, dropIntoEditor: { enabled: false },
       contextmenu: true, mouseWheelZoom: true, colorDecorators: true, unicodeHighlight: { ambiguousCharacters: false }
     };
   }
@@ -466,6 +505,8 @@
     F.emit('facet', key);
   }
   F.applyFacet = applyFacet;
+  F.editorOptions = editorOptions;
+  F.tabSizeFor = (def) => (F.settings.tabSize === 'auto' ? def.tab : +F.settings.tabSize);
 
   function renderToolbar(quiet) {
     const tb = $('#toolbar');
@@ -486,7 +527,7 @@
     def.tools.forEach((t) => {
       if (t.when && !t.when()) return;
       if (t.el) { tb.append(t.el()); return; }
-      tb.append(h('button', { class: 'chip' + (t.primary ? ' primary' : ''), title: t.title || t.label, onclick: () => { try { t.run(); } catch (e) { F.toast(esc(e.message), 'err'); } } },
+      tb.append(h('button', { class: 'chip' + (t.primary ? ' primary' : ''), title: t.title || t.label, onclick: (ev) => { try { t.run(ev); } catch (e) { F.toast(esc(e.message), 'err'); } } },
         t.primary ? null : h('span', { class: 'bullet' }), t.label, t.kbd ? h('span', { class: 'kbd', text: t.kbd }) : null));
     });
     if (quiet) tb.scrollLeft = sx;
@@ -604,7 +645,7 @@
         let model = monaco.editor.getModel(uri);
         const lang = def.langFor ? def.langFor(path) : def.lang;
         if (model) model.setValue(text); else model = monaco.editor.createModel(text, lang, uri);
-        model.updateOptions({ tabSize: def.tab, insertSpaces: true });
+        model.updateOptions({ tabSize: F.tabSizeFor(def), insertSpaces: true });
         doc = { model, saved: model.getAlternativeVersionId(), view: null, facet };
         S.docs.set(path, doc);
         model.onDidChangeContent(() => onContent(path));
@@ -662,11 +703,28 @@
     path = path || S.active;
     const doc = S.docs.get(path);
     if (!doc) return false;
-    const ver = verOf(doc);
+    let ver = verOf(doc);
     let text = null;
     try {
       if (doc.custom) { await doc.custom.save(); if (doc.custom.history) text = doc.custom.text(); }
-      else { text = doc.model.getValue(); await fs.write(path, text); }
+      else {
+        if (opts && opts.manual && F.settings.formatOnSave && path === S.active && F.editor.getModel() === doc.model) {
+          try { await F.editor.getAction('editor.action.formatDocument').run(); } catch (e) { /* nincs formázó */ }
+          ver = verOf(doc);
+        }
+        text = doc.model.getValue();
+        let fixed = text;
+        if (F.settings.trimTrailing) fixed = fixed.replace(/[ \t]+$/gm, '');
+        if (F.settings.finalNewline && fixed.length && !fixed.endsWith('\n')) fixed += '\n';
+        if (fixed !== text) {
+          const keep = path === S.active && F.editor.getModel() === doc.model ? F.editor.saveViewState() : null;
+          doc.model.pushEditOperations([], [{ range: doc.model.getFullModelRange(), text: fixed }], () => null);
+          if (keep) F.editor.restoreViewState(keep);
+          text = fixed;
+          ver = verOf(doc);
+        }
+        await fs.write(path, text);
+      }
     } catch (e) {
       F.toast('Mentés nem sikerült: ' + esc(e.message), 'err');
       setSave('Mentés sikertelen');
@@ -769,7 +827,7 @@
     if (F.settings.autosave) {
       clearTimeout(autosaveTimers[path]);
       const dd = S.docs.get(path);
-      autosaveTimers[path] = setTimeout(() => { if (F.dirty(path)) F.save(path); }, (dd && dd.custom && dd.custom.autosaveDelay) || 900);
+      autosaveTimers[path] = setTimeout(() => { if (F.dirty(path)) F.save(path); }, (dd && dd.custom && dd.custom.autosaveDelay) || F.settings.autosaveDelay || 900);
     }
     clearTimeout(changeTimers[path]);
     changeTimers[path] = setTimeout(() => {
@@ -883,7 +941,7 @@
       [...node.kids.values()].sort(sorter).forEach((k) => {
         const open = S.expanded.has(k.path);
         const ic = k.dir ? null : F.iconFor(k.path);
-        const row = h('div', { class: 'node' + (k.dir ? ' folder' : '') + (open ? ' open' : '') + (k.path === S.active ? ' active' : ''), style: { paddingLeft: (8 + depth * 14) + 'px' }, 'data-path': k.path, title: k.path },
+        const row = h('div', { class: 'node' + (k.dir ? ' folder' : '') + (open ? ' open' : '') + (k.path === S.active ? ' active' : ''), style: { paddingLeft: (8 + depth * 14) + 'px' }, 'data-path': k.path, 'data-dir': k.dir ? '1' : null, draggable: 'true', title: k.path },
           k.dir ? h('span', { class: 'chev', html: '<svg width="8" height="8" viewBox="0 0 8 8"><path d="M2 1 L6 4 L2 7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>' }) : h('span', { class: 'chev' }),
           k.dir ? h('span', { class: 'fi', style: { background: 'transparent', color: depth === 0 ? 'var(--accent)' : '#5A667A' }, html: depth === 0 ? '<svg width="12" height="12" viewBox="0 0 14 14"><path d="M7 1.5 L12.5 4.5 V9.5 L7 12.5 L1.5 9.5 V4.5 Z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>' : '<svg width="13" height="13" viewBox="0 0 14 14"><path d="M1.5 3.5 h4 l1 1 h6 v7 h-11 Z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>' })
             : h('span', { class: 'fi', style: { color: ic.c }, text: ic.t }),
@@ -985,25 +1043,46 @@
   }
   F.expandTo = expandTo;
 
-  F.renameItem = async (path) => {
+  /** Elem áthelyezése/átnevezése: a megnyitott fülek az új helyen nyílnak meg újra. */
+  F.moveItem = async (path, to, quiet) => {
+    if (!to || to === path) return false;
+    if (to.startsWith(path + '/')) { F.toast('Egy mappát nem lehet saját magába tenni.', 'warn'); return false; }
     const affected = S.open.filter((p) => p === path || p.startsWith(path + '/'));
     for (const p of affected) if (F.dirty(p)) await F.save(p);
-    const v = await F.dialog({ title: 'Átnevezés', fields: [{ id: 'name', label: 'Új név vagy útvonal', value: path }], selectStem: true, ok: 'Átnevezés', validate: (x) => validName(x.name) });
-    if (!v || v.name === path) return;
-    try { await fs.rename(path, v.name); } catch (e) { F.toast(esc(e.message), 'err'); return; }
+    try { await fs.rename(path, to); } catch (e) { F.toast(esc(e.message), 'err'); return false; }
     const wasActive = S.active;
+    const views = {};
     for (const p of affected) {
       const doc = S.docs.get(p);
+      if (doc && !doc.custom) views[p] = p === wasActive ? F.editor.saveViewState() : doc.view;
       S.open.splice(S.open.indexOf(p), 1);
       if (doc) { S.docs.delete(p); disposeDoc(doc); }
     }
     if (affected.includes(wasActive)) S.active = null;
-    expandTo(v.name);
+    if (S.expanded.has(path)) { S.expanded.delete(path); S.expanded.add(to); }
+    expandTo(to);
     await F.refreshTree();
-    for (const p of affected) await F.open(v.name + p.slice(path.length));
+    const reopen = affected.filter((p) => p !== wasActive).concat(affected.includes(wasActive) ? [wasActive] : []);
+    for (const p of reopen) {
+      const np = to + p.slice(path.length);
+      await F.open(np);
+      const d = S.docs.get(np);
+      if (d && views[p] && np === S.active && !d.custom) F.editor.restoreViewState(views[p]);
+    }
+    if (wasActive && !affected.includes(wasActive) && S.open.includes(wasActive)) await F.open(wasActive);
     if (!S.active) showWelcome();
-    F.toast('Átnevezve: <b>' + esc(v.name.split('/').pop()) + '</b>', 'ok');
+    F.emit('moved', path, to);
+    if (!quiet) F.toast('Áthelyezve: <b>' + esc(to) + '</b>', 'ok');
+    return true;
   };
+
+  F.renameItem = async (path) => {
+    const v = await F.dialog({ title: 'Átnevezés', fields: [{ id: 'name', label: 'Új név vagy útvonal', value: path }], selectStem: true, ok: 'Átnevezés', validate: (x) => validName(x.name) });
+    if (!v || v.name === path) return;
+    if (await F.moveItem(path, v.name, true)) F.toast('Átnevezve: <b>' + esc(v.name.split('/').pop()) + '</b>', 'ok');
+  };
+  F.validName = validName;
+  F.joinPath = joinPath;
 
   async function duplicate(path) {
     const text = await F.textOf(path);
@@ -1014,7 +1093,7 @@
   }
 
   F.deleteItem = async (path, isDir) => {
-    const ok = await F.confirm('Törlés', `Biztosan törlöd: <b>${esc(path)}</b>${isDir ? ' (a teljes mappát)' : ''}?<br><span style="color:var(--muted)">A FACET nem véglegesen töröl: a FACET kukájába kerül (<code>~/.facet</code>).</span>`, 'Törlés', true);
+    const ok = !F.settings.confirmDelete || await F.confirm('Törlés', `Biztosan törlöd: <b>${esc(path)}</b>${isDir ? ' (a teljes mappát)' : ''}?<br><span style="color:var(--muted)">A FACET nem véglegesen töröl: a FACET kukájába kerül (<code>~/.facet</code>).</span>`, 'Törlés', true);
     if (!ok) return;
     for (const p of S.open.filter((q) => q === path || q.startsWith(path + '/'))) {
       const doc = S.docs.get(p);
@@ -1352,7 +1431,7 @@
           items.push(it);
           let row;
           if (it.kind === 'cmd') {
-            row = h('div', { class: 'pal-item' }, h('span', { class: 'pal-ic', text: it.c.icon || it.c.label[0] }), h('span', { class: 'pal-label', html: markIdx(it.c.label, it.idx) }), it.c.detail ? h('span', { class: 'pal-detail', text: it.c.detail }) : null, it.c.kbd ? h('span', { class: 'kbd', text: it.c.kbd }) : null);
+            row = h('div', { class: 'pal-item' }, h('span', { class: 'pal-ic', text: it.c.icon || it.c.label[0] }), h('span', { class: 'pal-label', html: markIdx(it.c.label, it.idx) }), it.c.detail ? h('span', { class: 'pal-detail', text: it.c.detail }) : null, (it.c.key && F.keys ? F.keys.label(it.c.key) : it.c.kbd) ? h('span', { class: 'kbd', text: it.c.key && F.keys ? F.keys.label(it.c.key) : it.c.kbd }) : null);
           } else if (it.kind === 'file') {
             const ic = F.iconFor(it.p);
             row = h('div', { class: 'pal-item' }, h('span', { class: 'pal-ic', style: { color: ic.c, background: 'transparent' }, text: ic.t }), h('span', { class: 'pal-label', html: markIdx(it.p.split('/').pop(), it.idx) }), h('span', { class: 'pal-detail', text: it.p.split('/').slice(0, -1).join('/') }));
@@ -1578,39 +1657,16 @@
   }, 250);
 
   // ───────────── beállítások ─────────────
-  function renderSettings() {
-    const box = $('#settingsPanel');
-    box.innerHTML = '';
-    const tog = (key, label, note) => {
-      const id = 'set_' + key;
-      const inp = h('input', { type: 'checkbox', id });
-      inp.checked = !!F.settings[key];
-      inp.onchange = () => { F.settings[key] = inp.checked; F.saveSettings(); applySettings(); };
-      box.append(h('div', { class: 'set-row' }, h('label', { class: 'set-row inline', for: id }, h('span', { text: label }), h('span', { class: 'toggle' }, inp, h('span'))), note ? h('span', { class: 'set-note', text: note }) : null));
-    };
-    const fsSel = h('select', { class: 'field', id: 'set_font' }, [12, 13, 14, 15, 16, 18, 20].map((n) => h('option', { value: n, selected: n === F.settings.fontSize }, n + ' px')));
-    fsSel.onchange = () => { F.settings.fontSize = +fsSel.value; F.saveSettings(); applySettings(); };
-    box.append(h('label', { class: 'set-row', for: 'set_font' }, h('span', { text: 'Betűméret a szerkesztőben' }), fsSel));
-    tog('autosave', 'Automatikus mentés', 'Gépelés után kb. egy másodperccel ment. Az Időgép így sem veszít semmit.');
-    tog('liveCheck', 'Élő Java ellenőrzés', 'Mentéskor a háttérben lefordítja a projektet, és azonnal jelzi a hibákat.');
-    tog('lens', 'Hibatolmács a hibás sor alatt', 'A magyar magyarázat közvetlenül a kódban jelenik meg.');
-    tog('pulse', 'Pulzusvonal', 'A szerkesztő feletti vonal a gépelés ritmusára világít.');
-    tog('minimap', 'Kódtérkép (minimap)');
-    tog('wrap', 'Sortörés a szerkesztőben');
-    tog('ligatures', 'Ligatúrák (=> != <=)');
-    const e = S.engine;
-    box.append(h('div', { class: 'card', style: { marginTop: '6px' } },
-      h('div', { class: 'card-title' }, 'Motor', h('span', { class: 'sub', text: e ? 'helyi' : 'demó' })),
-      h('div', { class: 'set-note', html: e
-        ? `Java ${esc(e.java)}${e.jdk ? '' : ' <b style="color:var(--err)">· nincs javac (JDK kell)</b>'}<br>Megnyitott mappa:<br><code style="font-family:var(--font-code);color:var(--fg-2)">${esc(e.workspace ? shortPath(e.workspace) : 'nincs')}</code>`
-        : 'A fájlok most a böngészőben vannak tárolva, és a Java futtatás nem érhető el.<br>Indítsd el a FACET-et a <b>start.command</b> fájllal, és nyisd meg a <code>http://localhost:7777</code> címet.' })));
-  }
   function applySettings() {
     if (F.editor) F.editor.updateOptions(editorOptions());
-    if (F.diffEditor) F.diffEditor.updateOptions({ fontSize: F.settings.fontSize, lineHeight: Math.round(F.settings.fontSize * 1.6) });
+    if (F.diffEditor) F.diffEditor.updateOptions({ fontSize: F.settings.fontSize, lineHeight: Math.round(F.settings.fontSize * (F.settings.lineHeight || 1.6)) });
+    for (const [, d] of S.docs) if (d.model) d.model.updateOptions({ tabSize: F.tabSizeFor(F.facets[d.facet]) });
     document.body.classList.toggle('no-pulse', !F.settings.pulse);
+    document.documentElement.style.setProperty('--term-size', (F.settings.termFontSize || 13) + 'px');
+    document.documentElement.style.setProperty('--flow-w', ({ narrow: '900px', wide: '1280px', full: '100%' })[F.settings.flowWidth] || '1280px');
     F.emit('settings');
   }
+  F.applySettings = applySettings;
 
   // ───────────── oldalsáv nézetek ─────────────
   // ───────────── panelek ki/be ─────────────
@@ -1639,7 +1695,6 @@
     F.setPanel('side', true);
     if (v === 'search') setTimeout(() => $('#searchInput').focus(), 10);
     if (v === 'history') H.renderPanel();
-    if (v === 'settings') renderSettings();
     F.emit('view', v);
   }
   F.setView = setView;
@@ -1699,6 +1754,14 @@
           const f = file.replace(/\\/g, '/');
           if (!root || !f.startsWith(root + '/') || f.includes('/node_modules/')) return m;
           return `<span class="t-link" data-path="${esc(f.slice(root.length + 1))}" data-line="${line}" data-col="${col || 1}">${m}</span>`;
+        })
+        .replace(/File &quot;([^&]+?\.pyw?)&quot;, line (\d+)/g, (m, file, line) => {
+          const f = file.replace(/\\/g, '/');
+          let rel = null;
+          if (root && f.startsWith(root + '/')) rel = f.slice(root.length + 1);
+          else if (!/^([A-Za-z]:)?\//.test(f) && F.files().some((x) => x.endsWith('/' + f) || x === f)) rel = F.files().find((x) => x.endsWith('/' + f) || x === f);
+          if (!rel || /(^|\/)(\.?venv|site-packages)\//.test(rel)) return m;
+          return `File &quot;<span class="t-link" data-path="${esc(rel)}" data-line="${line}" data-col="1">${esc(rel)}</span>&quot;, line ${line}`;
         });
     },
     /** enabled: a futó program bemenete; különben parancsmód (ha a helyi motor elérhető). */
@@ -1903,6 +1966,7 @@
     document.body.classList.toggle('flow', on);
     $('#flowPill').hidden = !on;
     if (on) { S.flowStart = Date.now(); F.toast('Flow mód: csak te és a kód. Kilépés: Esc'); }
+    F.emit('flow', on);
     setTimeout(() => F.editor && F.editor.layout(), 30);
   }
   F.toggleFlow = toggleFlow;
@@ -1945,33 +2009,17 @@
 
   // ───────────── billentyűk ─────────────
   function onKey(e) {
-    const mod = modKey(e);
-    const k = e.code && e.code.startsWith('Key') ? e.code.slice(3).toLowerCase() : e.key.toLowerCase();
     const overlayOpen = !$('#overlay').hidden;
     if (e.key === 'Escape') {
       if (overlayOpen) { closeOverlay(); e.preventDefault(); return; }
       if (!$('#menu').hidden) { hideMenu(); return; }
+      if (F.settingsPage && F.settingsPage.isOpen()) { F.settingsPage.close(); e.preventDefault(); return; }
       if (!$('#diffView').hidden) { closeDiff(); e.preventDefault(); return; }
       if (document.body.classList.contains('flow')) { toggleFlow(false); e.preventDefault(); return; }
       return;
     }
-    if (!mod) return;
-    // A dokumentumszerkesztőben a ⌘B/I/U formázás, nem panelkapcsoló.
-    if (e.target && e.target.closest && e.target.closest('#customView') && ['b', 'i', 'u', 'z', 'y', 'a'].includes(k) && !e.altKey) return;
-    const stop = () => { e.preventDefault(); e.stopPropagation(); };
-    if (k === 'k' && !e.shiftKey) { stop(); if (overlayOpen) closeOverlay(); else F.palette('all'); return; }
-    if (k === 'p' && !e.shiftKey) { stop(); if (overlayOpen) closeOverlay(); else F.palette('files'); return; }
-    if (overlayOpen) return;
-    if (k === 's') { stop(); if (e.altKey) F.saveAll(); else if (S.active) F.save(S.active, { manual: true }); return; }
-    if (k === 'enter' && !e.shiftKey) { stop(); F.run(); return; }
-    if (k === 'n' && e.altKey) { stop(); F.newProject(); return; }
-    if (k === 'n' && !e.shiftKey) { stop(); F.newFile(); return; }
-    if (k === 'b' && !e.shiftKey) { stop(); if (e.altKey) F.setPanel('stage'); else toggleSide(); return; }
-    if (k === 'o' && !e.shiftKey && fs.mode === 'local') { stop(); F.openFolderDialog(); return; }
-    if (k === 'j') { stop(); F.bottom.toggle(); return; }
-    if (k === 'm' && e.shiftKey) { stop(); toggleFlow(); return; }
-    if (k === 'f' && e.shiftKey) { stop(); setView('search'); return; }
-    if (k === 'e' && e.shiftKey) { stop(); setView('files'); return; }
+    // A billentyűparancsok (átírhatók a Beállításokban): workbench.js
+    if (F.keys) F.keys.handle(e, overlayOpen);
   }
 
   // ───────────── futtatás ─────────────
@@ -1986,29 +2034,29 @@
   // ───────────── általános parancsok ─────────────
   function registerCommands() {
     const K = isMac ? '⌘' : 'Ctrl+';
-    F.command({ label: 'Új fájl', keywords: 'letrehozas file create', kbd: K + 'N', icon: '+', run: () => F.newFile() });
-    F.command({ label: 'Új projekt', keywords: 'sablon template project', kbd: '⌥' + K + 'N', icon: '◇', run: () => F.newProject() });
-    F.command({ label: 'Mappa megnyitása…', keywords: 'open folder megnyitas projekt', kbd: K + 'O', icon: '⌂', when: () => fs.mode === 'local', run: () => F.openFolderDialog() });
+    F.command({ label: 'Új fájl', keywords: 'letrehozas file create', key: 'newFile', icon: '+', run: () => F.newFile() });
+    F.command({ label: 'Új projekt', keywords: 'sablon template project', key: 'newProject', icon: '◇', run: () => F.newProject() });
+    F.command({ label: 'Mappa megnyitása…', keywords: 'open folder megnyitas projekt', key: 'openFolder', icon: '⌂', when: () => fs.mode === 'local', run: () => F.openFolderDialog() });
     F.command({ label: 'Mappa bezárása', keywords: 'close folder bezaras', icon: '×', when: () => !!(S.engine && S.engine.workspace), run: () => F.closeFolder() });
     F.command({ label: 'Új mappa', keywords: 'folder directory konyvtar', icon: '+', run: () => F.newFolder((F.active() ? F.active().path.split('/').slice(0, -1).join('/') : '')) });
-    F.command({ label: 'Mentés', keywords: 'save mentsd', kbd: K + 'S', icon: 'S', when: () => !!S.active, run: () => F.save(S.active, { manual: true }) });
-    F.command({ label: 'Összes mentése', keywords: 'save all', kbd: '⌥' + K + 'S', icon: 'S', run: () => F.saveAll() });
-    F.command({ label: 'Futtatás', keywords: 'run futtasd inditas start', kbd: K + '↵', icon: '▶', when: () => !!(F.active() && F.active().def.run), run: () => F.run() });
-    F.command({ label: 'Formázás', keywords: 'format formazd rendezd behuzas', kbd: '⇧⌥F', icon: '≡', when: () => F.hasCode(), run: () => F.editor.getAction('editor.action.formatDocument').run() });
+    F.command({ label: 'Mentés', keywords: 'save mentsd', key: 'save', icon: 'S', when: () => !!S.active, run: () => F.save(S.active, { manual: true }) });
+    F.command({ label: 'Összes mentése', keywords: 'save all', key: 'saveAll', icon: 'S', run: () => F.saveAll() });
+    F.command({ label: 'Futtatás', keywords: 'run futtasd inditas start', key: 'run', icon: '▶', when: () => !!(F.active() && F.active().def.run), run: () => F.run() });
+    F.command({ label: 'Formázás', keywords: 'format formazd rendezd behuzas', key: 'format', icon: '≡', when: () => F.hasCode(), run: () => F.editor.getAction('editor.action.formatDocument').run() });
     F.command({ label: 'Fájl bezárása', keywords: 'close tab', icon: '×', when: () => !!S.active, run: () => F.closeFile(S.active) });
-    F.command({ label: 'Keresés a projektben', keywords: 'search find kereses', kbd: '⇧' + K + 'F', icon: '⌕', run: () => setView('search') });
-    F.command({ label: 'Csere a fájlban', keywords: 'replace csere', kbd: '⌥' + K + 'F', icon: '⇄', when: () => F.hasCode(), run: () => F.editor.getAction('editor.action.startFindReplaceAction').run() });
-    F.command({ label: 'Ugrás sorra…', keywords: 'goto line sor', kbd: '⌃G', icon: '#', when: () => F.hasCode(), run: () => F.editor.getAction('editor.action.gotoLine').run() });
+    F.command({ label: 'Keresés a projektben', keywords: 'search find kereses', key: 'search', icon: '⌕', run: () => setView('search') });
+    F.command({ label: 'Csere a fájlban', keywords: 'replace csere', key: 'replace', icon: '⇄', when: () => F.hasCode(), run: () => F.editor.getAction('editor.action.startFindReplaceAction').run() });
+    F.command({ label: 'Ugrás sorra…', keywords: 'goto line sor', key: 'gotoLine', icon: '#', when: () => F.hasCode(), run: () => F.editor.getAction('editor.action.gotoLine').run() });
     F.command({ label: 'Időgép megnyitása', keywords: 'history elozmenyek visszaallitas undo verzio', icon: '◷', run: () => setView('history') });
-    F.command({ label: 'Flow mód', keywords: 'fokusz zen focus', kbd: '⇧' + K + 'M', icon: '~', run: () => toggleFlow() });
-    F.command({ label: 'Oldalsáv ki/be', keywords: 'sidebar', kbd: K + 'B', icon: '▏', run: () => toggleSide() });
-    F.command({ label: 'Alsó panel ki/be', keywords: 'terminal panel', kbd: K + 'J', icon: '▁', run: () => F.bottom.toggle() });
-    F.command({ label: 'Facet-panel ki/be', keywords: 'stage jobb panel elonezet', icon: '▕', kbd: '⌥' + K + 'B', run: () => F.setPanel('stage') });
-    F.command({ label: 'Beállítások', keywords: 'settings betumeret font', icon: '⚙', run: () => setView('settings') });
+    F.command({ label: 'Flow mód', keywords: 'fokusz zen focus', key: 'flow', icon: '~', run: () => toggleFlow() });
+    F.command({ label: 'Oldalsáv ki/be', keywords: 'sidebar', key: 'toggleSide', icon: '▏', run: () => toggleSide() });
+    F.command({ label: 'Alsó panel ki/be', keywords: 'terminal panel', key: 'toggleBottom', icon: '▁', run: () => F.bottom.toggle() });
+    F.command({ label: 'Facet-panel ki/be', keywords: 'stage jobb panel elonezet', icon: '▕', key: 'toggleStage', run: () => F.setPanel('stage') });
+    F.command({ label: 'Beállítások', keywords: 'settings betumeret font billentyu shortcut', key: 'settings', icon: '⚙', run: () => F.settingsPage.open() });
     F.command({ label: 'Kezdőképernyő', keywords: 'welcome home sablonok', icon: '◆', run: async () => { for (const p of [...S.open]) if (!(await F.closeFile(p))) return; showWelcome(); } });
     F.command({ label: 'Betűméret növelése', keywords: 'zoom nagyobb', icon: 'A', run: () => { F.settings.fontSize = Math.min(24, F.settings.fontSize + 1); F.saveSettings(); applySettings(); } });
     F.command({ label: 'Betűméret csökkentése', keywords: 'zoom kisebb', icon: 'a', run: () => { F.settings.fontSize = Math.max(11, F.settings.fontSize - 1); F.saveSettings(); applySettings(); } });
-    F.command({ label: 'Megjegyzés ki/be', keywords: 'comment komment', kbd: K + '/', icon: '//', when: () => F.hasCode(), run: () => F.editor.getAction('editor.action.commentLine').run() });
+    F.command({ label: 'Megjegyzés ki/be', keywords: 'comment komment', key: 'comment', icon: '//', when: () => F.hasCode(), run: () => F.editor.getAction('editor.action.commentLine').run() });
     F.command({ label: 'Fájlfa frissítése', keywords: 'refresh reload', icon: '↻', run: () => F.refreshTree() });
   }
 

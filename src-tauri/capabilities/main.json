@@ -1,0 +1,18 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main",
+  "description": "A FACET felülete (a helyi motorról töltődik be) csak az ablak nagyítását és a teljes képernyőt állíthatja.",
+  "windows": [
+    "main"
+  ],
+  "remote": {
+    "urls": [
+      "http://127.0.0.1:*/*",
+      "http://localhost:*/*"
+    ]
+  },
+  "permissions": [
+    "core:webview:allow-set-webview-zoom",
+    "core:window:allow-set-fullscreen"
+  ]
+}

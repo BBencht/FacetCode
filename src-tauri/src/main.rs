@@ -360,6 +360,8 @@ fn main() {
                 .inner_size(1440.0, 900.0)
                 .min_inner_size(960.0, 600.0)
                 .center()
+                // A fájlok behúzását a felület kezeli (HTML5): így a fájlfán belüli húzás is működik.
+                .disable_drag_drop_handler()
                 .build()?;
 
             let handle = app.handle().clone();

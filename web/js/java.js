@@ -1120,7 +1120,7 @@
     classes.forEach((c) => { const l = level[c.name] || 0; (rows[l] = rows[l] || []).push(c); });
     let y = 20;
     const rowWidths = rows.map((row) => (row || []).reduce((sum, c) => {
-      const lines = umlText(c);
+      const lines = c.umlLines || umlText(c);
       const w = Math.max(160, Math.min(420, Math.max(...lines.map((t) => t.replace(/&lt;|&gt;|&amp;/g, '<').length)) * 8 + 30));
       boxes[c.name] = { w: Math.round(w / 10) * 10, h: Math.round((lines.length * ROWH + 24) / 10) * 10, lines };
       return sum + boxes[c.name].w + GAPX;
