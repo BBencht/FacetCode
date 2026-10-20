@@ -253,8 +253,8 @@ Az egér vissza/előre gombja (és <kbd>Alt</kbd> <kbd>←</kbd>) a kódban lép
 
 | | Rendszer | Fájl |
 |:---:|---|---|
-| 🍎 | **macOS** · Apple Silicon és Intel | `FACET_1.2.0_universal.dmg` |
-| 🪟 | **Windows 10 / 11** | `FACET_1.2.0_x64-setup.exe` vagy `.msi` |
+| 🍎 | **macOS** · Apple Silicon és Intel | `FACET_1.2.1_universal.dmg` |
+| 🪟 | **Windows 10 / 11** | `FACET_1.2.1_x64-setup.exe` vagy `.msi` |
 | 🐧 | **Linux** | `.AppImage`, `.deb` (Ubuntu, Debian) vagy `.rpm` (Fedora) |
 
 ### Három lépés, és kész
@@ -381,7 +381,7 @@ FacetCode/
 └── .github/workflows/         build macOS-re, Windowsra, Linuxra
 ```
 
-Minden push után a GitHub Actions elkészíti a három rendszer telepítőit. Egy `v*` címkével (pl. `v1.2.0`) létrehozott kiadáshoz a telepítők automatikusan felkerülnek.
+Minden push után a GitHub Actions elkészíti a három rendszer telepítőit. Egy `v*` címkével (pl. `v1.2.1`) létrehozott kiadáshoz a telepítők automatikusan felkerülnek.
 </details>
 
 <br>
@@ -389,6 +389,13 @@ Minden push után a GitHub Actions elkészíti a három rendszer telepítőit. E
 ## 📜 Változásnapló
 
 <details open>
+<summary><b>1.2.1</b> · macOS-javítás</summary>
+<br>
+
+- Az 1.2.0 macOS-en és Linuxon nem indult el („A FACET motorja indulás közben leállt”): egy Java-kapcsoló rossz helyre került az indításkor. Javítva, és a motor mostantól az ilyen hibákat át is ugorja.
+</details>
+
+<details>
 <summary><b>1.2.0</b> · Python, átírható billentyűk, húzd és ejtsd</summary>
 <br>
 
@@ -446,6 +453,6 @@ A FACET [MIT-licenc](LICENSE) alatt érhető el: szabadon használhatod, módos�
 
 <br><br>
 
-<sub>Készült ◆ Magyarországon · <b>FACET 1.2.0</b> · <a href="https://github.com/BBencht">@BBencht</a></sub>
+<sub>Készült ◆ Magyarországon · <b>FACET 1.2.1</b> · <a href="https://github.com/BBencht">@BBencht</a></sub>
 
 </div>

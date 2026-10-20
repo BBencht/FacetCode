@@ -128,7 +128,7 @@
 
   <g class="t">
     <rect x="1140" y="34" width="104" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.05" stroke="#2A3343"/>
-    <text x="1192" y="54" font-size="14" font-weight="700" fill="#AEB8C8" text-anchor="middle">v1.2.0</text>
+    <text x="1192" y="54" font-size="14" font-weight="700" fill="#AEB8C8" text-anchor="middle">v1.2.1</text>
     <text x="1244" y="430" font-size="13" fill="#4E596B" text-anchor="end">macOS · Windows 10/11 · Linux</text>
   </g>
 </svg>

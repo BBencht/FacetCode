@@ -210,8 +210,12 @@ fn start_engine(app: &tauri::AppHandle) -> Result<(Child, u16), (String, String)
     let mut cmd = Command::new(&java);
     cmd.arg("-Dfile.encoding=UTF-8")
         .arg("-Dsun.stdout.encoding=UTF-8")
-        .arg("-Dsun.stderr.encoding=UTF-8")
-        .arg("-jar")
+        .arg("-Dsun.stderr.encoding=UTF-8");
+    // macOS/Linux: a Finderből indított alkalmazásnál a fájlnevek kódolása ASCII lehet.
+    // Windowson nem kell (ott a Java UTF-16-ot használ). A JVM-kapcsolóknak a -jar ELŐTT kell lenniük.
+    #[cfg(not(windows))]
+    cmd.arg("-Dsun.jnu.encoding=UTF-8");
+    cmd.arg("-jar")
         .arg(&jar)
         .arg("--app")
         .arg("--port")
@@ -230,10 +234,6 @@ fn start_engine(app: &tauri::AppHandle) -> Result<(Child, u16), (String, String)
         cmd.creation_flags(CREATE_NO_WINDOW);
     }
 
-    // macOS/Linux: a Finderből indított alkalmazásnál a fájlnevek kódolása ASCII lehet.
-    // Windowson nem kell (ott a Java UTF-16-ot használ), és ott nem is szabad felülírni.
-    #[cfg(not(windows))]
-    cmd.arg("-Dsun.jnu.encoding=UTF-8");
 
     let mut child = cmd
         .spawn()

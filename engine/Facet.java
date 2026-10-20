@@ -55,7 +55,7 @@ import java.util.stream.Stream;
 
 public class Facet {
 
-    static final String VERSION = "1.2.0";
+    static final String VERSION = "1.2.1";
     /** A megnyitott mappa (null, ha még nincs). */
     static volatile Path WS;
     /** A FACET saját adatai a megnyitott mappához (Időgép, fordítás, kuka) — nem a projektbe kerülnek. */
@@ -87,6 +87,7 @@ public class Facet {
             else if (a.equals("--port") && i + 1 < args.length) portArg = Integer.parseInt(args[++i]);
             else if (a.equals("--web") && i + 1 < args.length) webArg = args[++i];
             else if (a.matches("\\d{2,5}")) portArg = Integer.parseInt(a);
+            else if (a.startsWith("-")) System.err.println("Ismeretlen kapcsoló, kihagyom: " + a);
             else pos.add(a);
         }
         HOME = Paths.get(System.getProperty("user.home")).toAbsolutePath().normalize();
@@ -94,9 +95,13 @@ public class Facet {
         // A teljes PATH felderítése (login shell) a háttérben fut, hogy az indulás gyors maradjon.
         new Thread(() -> { ENV = buildEnv(); ENV_READY.countDown(); }, "facet-env").start();
         if (pos.size() > 0) {
-            Path start = Paths.get(pos.get(0).replaceFirst("^~", HOME.toString())).toAbsolutePath().normalize();
-            Files.createDirectories(start);
-            openWorkspace(start);
+            try {
+                Path start = Paths.get(pos.get(0).replaceFirst("^~", HOME.toString())).toAbsolutePath().normalize();
+                Files.createDirectories(start);
+                openWorkspace(start);
+            } catch (Exception e) {
+                System.err.println("Nem tudom megnyitni a mappát: " + pos.get(0) + " (" + e.getMessage() + ")");
+            }
         }
 
         int port = portArg != null ? portArg : 7777;
